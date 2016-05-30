@@ -1,0 +1,7 @@
+
+(def foo 'foostring')
+
+(print foo)
+
+(print "barbaz")
+
