@@ -17,8 +17,8 @@ set(HEADERS
     "include/interpreter_funcs.h"
     "include/interpreter_gc.h"
     "include/interpreter_stackframe.h"
-    "include/object.h.h"
-    "include/parser.h.h"
+    "include/object.h"
+    "include/parser.h"
     "include/stdlib/list.h"
     "include/stdlib/math.h"
     "include/stdlib/print.h"
@@ -35,7 +35,8 @@ set(SOURCES
     "src/stdlib/list.c"
     "src/stdlib/print.c"
     )
-add_library(traylang-lib SHARED
+
+add_library(traylang STATIC
     ${SOURCES}
     ${BISON_TRLParser_OUTPUTS}
     ${FLEX_TRLLexer_OUTPUTS}
@@ -43,4 +44,17 @@ add_library(traylang-lib SHARED
 
 find_package(BCLib REQUIRED)
 include_directories("${BCLIB_INCLUDE_DIRS}")
-target_link_libraries(traylang-lib bclib)
+target_link_libraries(traylang bclib)
+
+
+set_target_properties(traylang PROPERTIES
+    PUBLIC_HEADER "${HEADERS}")
+
+install(TARGETS traylang
+    DESTINATION lib
+    EXPORT TrayLangTargets
+    LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT shlib
+    PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}/traylang"
+    COMPONENT dev
+    )
+

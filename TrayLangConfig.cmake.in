@@ -1,0 +1,17 @@
+# - Config file for the TrayLang package
+# It defines the following variables
+#  TRAYLANG_INCLUDE_DIRS - include directories for TrayLang
+#  TRAYLANG_LIBRARIES    - libraries to link against
+#  TRAYLANG_EXECUTABLE   - the tray executable
+
+# Compute paths
+get_filename_component(TRAYLANG_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(TRAYLANG_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET traylang AND NOT TRAYLANG_BINARY_DIR)
+    include("${TRAYLANG_CMAKE_DIR}/TrayLangTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by TrayLangTargets.cmake
+set(TRAYLANG_LIBRARIES traylang)
