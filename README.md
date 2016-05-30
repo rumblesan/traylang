@@ -13,7 +13,7 @@ Building
 cd build
 cmake ..
 make
-make tests
+make test
 ```
 
 Installing
