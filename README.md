@@ -16,6 +16,14 @@ make
 make tests
 ```
 
+Installing
+----------
+
+Everything should be setup to 'just work', with CMake handling installing libs, headers and the executable to the right place.
+```bash
+make install
+```
+
 Bison & Flex
 ----
 
@@ -26,6 +34,7 @@ On OSX, the following may be necessary to make sure that CMake finds the version
 ```bash
 export CMAKE_PREFIX_PATH=`brew --prefix`/opt/bison/bin:`brew --prefix`/opt/flex/bin
 ```
+
 Contact
 -------
 
