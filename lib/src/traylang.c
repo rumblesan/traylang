@@ -5,7 +5,7 @@
 #include "traylang.h"
 #include "interpreter.h"
 #include "interpreter_funcs.h"
-#include "traylang/parser.h"
+#include "parser.h"
 #include "ast.h"
 
 #include "stdlib/print.h"
