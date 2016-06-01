@@ -81,6 +81,12 @@ void interpreter_error(Interpreter *interpreter, bstring err_message) {
     interpreter->err_message = err_message;
 }
 
+void interpreter_clear_error(Interpreter *interpreter) {
+    interpreter->error = 0;
+    bdestroy(interpreter->err_message);
+    interpreter->err_message = bfromcstr("");
+}
+
 Interpreter *interpreter_enter_scope(Interpreter *interpreter) {
     if (interpreter->debug_mode) {
         debug("Entering scope");
@@ -98,11 +104,12 @@ Interpreter *interpreter_leave_scope(Interpreter *interpreter) {
         debug("Leaving scope");
     }
     StackFrame *stackframe = stack_pop(interpreter->scopes);
-    check(stackframe, "Could not leave previous scope");
+    check(stackframe != NULL, "Could not leave previous scope");
 
     stackframe_destroy(stackframe);
     return interpreter;
 error:
+    interpreter_error(interpreter, bfromcstr("Could not leave scope"));
     return NULL;
 }
 

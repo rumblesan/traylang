@@ -15,6 +15,8 @@ void interpreter_set_debug(Interpreter *interpreter, int debug_value);
 
 void interpreter_error(Interpreter *interpreter, bstring err_message);
 
+void interpreter_clear_error(Interpreter *interpreter);
+
 Interpreter *interpreter_enter_scope(Interpreter *interpreter);
 
 Interpreter *interpreter_leave_scope(Interpreter *interpreter);
