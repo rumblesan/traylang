@@ -2,10 +2,13 @@
 #define INTERPRETER_FUNCS_H
 
 #include "interpreter.h"
+
 #include "ast.h"
 #include "object.h"
 #include "bclib/list.h"
 #include "bclib/bstrlib.h"
+
+Interpreter *interpreter_create();
 
 void interpreter_destroy(Interpreter *interpreter);
 

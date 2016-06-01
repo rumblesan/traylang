@@ -20,7 +20,6 @@ set(HEADERS
 set(SOURCES
     "src/traylang.c"
     "src/traylang_ffi.c"
-    "src/interpreter.c"
     "src/interpreter_funcs.c"
     "src/interpreter_gc.c"
     "src/interpreter_stackframe.c"

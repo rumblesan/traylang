@@ -28,6 +28,4 @@ typedef struct Interpreter {
 
 } Interpreter;
 
-Interpreter *interpreter_create();
-
 #endif
