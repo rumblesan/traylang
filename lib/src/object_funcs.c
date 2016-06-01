@@ -112,7 +112,8 @@ void object_destroy(Object *object) {
             lambda_destroy(object->lambda);
             break;
         case LIST:
-            object_list_destroy(object->list);
+            debug("Elements of list freed separately");
+            list_destroy(object->list);
             break;
         case NOTHING:
             debug("Not freeing up Nothing");
