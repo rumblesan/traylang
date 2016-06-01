@@ -1,13 +1,13 @@
 include_directories(include)
 
-set(TRAYLANG_TEST_SOURCES
-    "src/traylang/test_interpreter.c"
+set(TEST_SOURCES
+    "src/test_interpreter.c"
     )
 
-foreach(TEST_FILE ${TRAYLANG_TEST_SOURCES})
+foreach(TEST_FILE ${TEST_SOURCES})
     get_filename_component(TEST_NAME ${TEST_FILE} NAME_WE)
-    add_executable("traylang_${TEST_NAME}" ${TEST_FILE})
-    target_link_libraries("traylang_${TEST_NAME}" traylang)
-    add_test("traylang_${TEST_NAME}" "traylang_${TEST_NAME}")
+    add_executable("${TEST_NAME}" ${TEST_FILE})
+    target_link_libraries("${TEST_NAME}" traylang)
+    add_test("${TEST_NAME}" "${TEST_NAME}")
 endforeach(TEST_FILE)
 
