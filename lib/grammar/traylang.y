@@ -32,6 +32,20 @@ int parse(Block **ast, FILE *fp) {
     return parseResult;
 }
 
+int parse_string(Block **ast, bstring program) {
+
+    yyscan_t scanner;
+
+    yylex_init(&scanner);
+    yy_scan_string(bdata(program), scanner);
+
+    int parseResult = yyparse(scanner, ast);
+
+    yylex_destroy(scanner);
+
+    return parseResult;
+}
+
 %}
 
 %define parse.error verbose

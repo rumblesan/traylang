@@ -83,6 +83,28 @@ error:
     return 1;
 }
 
+int traylang_interpret_string(TrayLang *tray, bstring program) {
+
+    Block *ast;
+
+    int parseResult = parse_string(&ast, program);
+
+    check(parseResult == 0, "Error during parsing");
+
+    interpret(tray->interpreter, ast);
+
+    ast_block_cleanup(ast);
+
+    check(
+        tray->interpreter->error == 0,
+        "Error whilst interpreting: %s", tray->interpreter->err_message->data
+    );
+
+    return 0;
+error:
+    return 1;
+}
+
 void traylang_cleanup(TrayLang *tray) {
     interpreter_destroy(tray->interpreter);
     free(tray);

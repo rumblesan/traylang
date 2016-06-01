@@ -4,7 +4,10 @@
 #include <stdio.h>
 
 #include "ast.h"
+#include "bclib/bstrlib.h"
 
 int parse(Block **block, FILE *fp);
+
+int parse_string(Block **block, bstring program);
 
 #endif
