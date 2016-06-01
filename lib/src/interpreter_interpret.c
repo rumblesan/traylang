@@ -106,11 +106,7 @@ error:
 }
 
 Object *interpret_application(Interpreter *interpreter, Application *application) {
-    int arg_num = list_count(application->args);
-    if (interpreter->debug_mode) {
-        debug("Application");
-        debug("Arg num: %d", arg_num);
-    }
+    debug("Application - arg num: %d", list_count(application->args));
 
     Object *func_obj = interpret_expression(interpreter, application->expr);
     Object *result;
@@ -151,9 +147,7 @@ error:
 }
 
 Object *interpret_call_lambda(Interpreter *interpreter, LambdaObject *lambda, List *args) {
-    if (interpreter->debug_mode) {
-        debug("Applying lambda");
-    }
+    debug("Applying lambda");
     interpreter_enter_scope(interpreter);
     Interpreter *i = interpreter_assign_args(
         interpreter,
@@ -173,33 +167,23 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression) {
     Object *v = NULL;
     switch(expression->expressionType) {
         case APPLICATIONEXPR:
-            if (interpreter->debug_mode) {
-                debug("interpret application");
-            }
+            debug("interpret application");
             v = interpret_application(interpreter, expression->application);
             break;
         case LAMBDAEXPR:
-            if (interpreter->debug_mode) {
-                debug("interpret lambda");
-            }
+            debug("interpret lambda");
             v = interpret_lambda(interpreter, expression->lambda);
             break;
         case NUMBEREXPR:
-            if (interpreter->debug_mode) {
-                debug("interpret number");
-            }
+            debug("interpret number");
             v = interpret_number(interpreter, expression->number);
             break;
         case STRINGEXPR:
-            if (interpreter->debug_mode) {
-                debug("interpret string");
-            }
+            debug("interpret string");
             v = interpret_string(interpreter, expression->string);
             break;
         case VARIABLEEXPR:
-            if (interpreter->debug_mode) {
-                debug("interpret variable");
-            }
+            debug("interpret variable");
             v = interpreter_get_variable(interpreter, expression->variable->name);
             break;
     }

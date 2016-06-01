@@ -32,7 +32,6 @@ Interpreter *interpreter_create() {
     List *objects = list_create();
     check_mem(objects);
 
-    interpreter->debug_mode = 0;
     interpreter->error = 0;
     interpreter->globals = globals;
     interpreter->call_stack = call_stack;
@@ -54,26 +53,23 @@ int globals_hashmap_object_destroy(HashmapNode *node) {
 void interpreter_destroy(Interpreter *interpreter) {
     if (interpreter) {
         if (interpreter->globals) {
+            debug("Destroying globals");
             hashmap_destroy(interpreter->globals);
         }
         if (interpreter->call_stack) {
+            debug("Destroying call stack");
             stack_destroy(interpreter->call_stack);
         }
         if (interpreter->scopes) {
+            debug("Destroying scopes");
             stack_destroy(interpreter->scopes);
         }
         if (interpreter->objects) {
-            if (interpreter->debug_mode) {
-                debug("Clearing objects");
-            }
+            debug("Destroying objects");
             object_list_destroy(interpreter->objects);
         }
         free(interpreter);
     }
-}
-
-void interpreter_set_debug(Interpreter *interpreter, int debug_value) {
-    interpreter->debug_mode = debug_value;
 }
 
 void interpreter_error(Interpreter *interpreter, bstring err_message) {
@@ -88,9 +84,7 @@ void interpreter_clear_error(Interpreter *interpreter) {
 }
 
 Interpreter *interpreter_enter_scope(Interpreter *interpreter) {
-    if (interpreter->debug_mode) {
-        debug("Entering scope");
-    }
+    debug("Entering scope");
     StackFrame *stackframe = stackframe_create();
     check(stackframe, "Could not create new stackframe");
     stack_push(interpreter->scopes, stackframe);
@@ -100,9 +94,7 @@ error:
 }
 
 Interpreter *interpreter_leave_scope(Interpreter *interpreter) {
-    if (interpreter->debug_mode) {
-        debug("Leaving scope");
-    }
+    debug("Leaving scope");
     StackFrame *stackframe = stack_pop(interpreter->scopes);
     check(stackframe != NULL, "Could not leave previous scope");
 
@@ -114,9 +106,7 @@ error:
 }
 
 Object *interpreter_set_global(Interpreter *interpreter, bstring name, Object *value) {
-    if (interpreter->debug_mode) {
-        debug("Set global: %s", name->data);
-    }
+    debug("Set global: %s", name->data);
     check(name, "NULL key passed for global name");
     check(value, "NULL value passed for global value: %s", name->data);
     int result = hashmap_set(interpreter->globals, name, value);
@@ -128,9 +118,7 @@ error:
 }
 
 Object *interpreter_set_variable(Interpreter *interpreter, bstring name, Object *value) {
-    if (interpreter->debug_mode) {
-        debug("Set variable: %s", name->data);
-    }
+    debug("Set variable: %s", name->data);
     check(name, "NULL key passed for variable name");
     check(value, "NULL value passed for variable value: %s", name->data);
     StackFrame *stackframe = interpreter->scopes->stack->value;
@@ -144,9 +132,7 @@ error:
 }
 
 Object *interpreter_get_variable(Interpreter *interpreter, bstring name) {
-    if (interpreter->debug_mode) {
-        debug("Get variable: %s", name->data);
-    }
+    debug("Get variable: %s", name->data);
     check(name, "NULL key passed for variable name");
     StackFrame *stackframe = interpreter->scopes->stack->value;
     check(stackframe, "Couldn't get stackframe");

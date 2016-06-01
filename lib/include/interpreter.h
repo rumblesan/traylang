@@ -14,8 +14,6 @@ typedef struct Interpreter {
 
     bstring err_message;
 
-    int debug_mode;
-
     Stack *call_stack;
 
     Stack *scopes;

@@ -13,9 +13,7 @@
 #include "bclib/bstrlib.h"
 
 void interpreter_gc(Interpreter *interpreter) {
-    if (interpreter->debug_mode) {
-        debug("Running garbage collection");
-    }
+    debug("Running garbage collection");
     int ocount = list_count(interpreter->objects);
     interpreter_gc_mark(interpreter);
     interpreter_gc_sweep(interpreter);
@@ -24,9 +22,10 @@ void interpreter_gc(Interpreter *interpreter) {
         new_max = INITIAL_GC_THRESHOLD;
     }
     interpreter->max_objects = new_max;
-    if (interpreter->debug_mode) {
-        debug("%d objects reduced to %d", ocount, list_count(interpreter->objects));
-    }
+    debug("%d objects reduced to %d",
+        ocount,
+        list_count(interpreter->objects)
+    );
 }
 
 int mark_variable(HashmapNode *node) {
@@ -48,23 +47,17 @@ int mark_scopes(Stack *scopes) {
 }
 
 void interpreter_gc_mark(Interpreter *interpreter) {
-    if (interpreter->debug_mode) {
-        debug("Marking stack");
-    }
+    debug("Marking stack objects");
     STACK_FOREACH(interpreter->call_stack, el) {
         object_mark(el->value);
     }
     mark_scopes(interpreter->scopes);
-    if (interpreter->debug_mode) {
-        debug("Marking globals");
-    }
+    debug("Marking globals objects");
     hashmap_traverse(interpreter->globals, mark_variable);
 }
 
 void interpreter_gc_sweep(Interpreter *interpreter) {
-    if (interpreter->debug_mode) {
-        debug("Sweeping");
-    }
+    debug("Sweeping");
     List *objects = interpreter->objects;
     ListNode *node = objects->first;
     ListNode *next_node;
