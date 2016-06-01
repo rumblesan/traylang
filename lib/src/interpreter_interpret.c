@@ -42,7 +42,7 @@ Object *interpret_element(Interpreter *interpreter, Element *element) {
 Object *interpret_vardef(Interpreter *interpreter, VarDefinition *vardef) {
     Object *expr_value = interpret_expression(interpreter, vardef->expression);
     check(interpreter->error != 1, "Error interpreting vardef");
-    check(expr_value, "Error evaluating vardef");
+    check(expr_value != NULL, "Error evaluating vardef");
     interpreter_set_variable(interpreter, bstrcpy(vardef->name), expr_value);
     check(interpreter->error != 1, "Error interpreting vardef");
     return expr_value;
@@ -59,7 +59,7 @@ Object *interpret_lambda(Interpreter *interpreter, Lambda *lambda) {
         list_push(arg_names, bstrcpy(cur->value));
     }
     Object *lambda_object = object_lambda(interpreter, arg_names, lambda->body);
-    check(lambda_object, "Error evaluating lambda");
+    check(lambda_object != NULL, "Error evaluating lambda");
     return lambda_object;
 error:
     if (interpreter->error == 0) {
@@ -73,6 +73,7 @@ Stack *interpreter_push_args(Interpreter *interpreter, List *args) {
     // Iterate list in reverse so first arg is highest on stack
     LIST_FOREACH(args, last, prev, cur) {
         val = interpret_expression(interpreter, cur->value);
+        check(val != NULL, "Error whilst evaluating expression");
         interpreter_stack_push(interpreter, val);
         check(interpreter->error != 1, "Error whilst interpreting");
     }
@@ -94,10 +95,10 @@ Interpreter *interpreter_assign_args(Interpreter *interpreter, List *arg_names, 
     int i;
     for (i = 0; i < arg_count; i += 1) {
         name = list_get(arg_names, i);
-        check(name, "Couldn't get argument name");
+        check(name != NULL, "Couldn't get argument name");
         val = list_get(args, i);
         evaled = interpret_expression(interpreter, val);
-        check(evaled, "arg expression didn't evaluate");
+        check(evaled != NULL, "arg expression didn't evaluate");
 
         interpreter_set_variable(interpreter, name, evaled);
         check(interpreter->error != 1, "Error whilst interpreting");
@@ -144,11 +145,14 @@ error:
 
 Object *interpret_call_c_function(Interpreter *interpreter, c_func func, List *args) {
     Stack *stack = interpreter_push_args(interpreter, args);
-    check(stack, "Error whilst pushing args to stack");
+    check(stack != NULL, "Error whilst pushing args to stack");
 
-    interpreter_enter_scope(interpreter);
+    Interpreter *i1 = interpreter_enter_scope(interpreter);
+    check(i1 != NULL, "Error whilst entering scope");
     Object *result = func(interpreter, list_count(args));
-    interpreter_leave_scope(interpreter);
+
+    Interpreter *i2 = interpreter_leave_scope(interpreter);
+    check(i2 != NULL, "Error whilst leaving scope");
     return result;
 error:
     if (interpreter->error == 0) {
@@ -160,15 +164,16 @@ error:
 Object *interpret_call_lambda(Interpreter *interpreter, LambdaObject *lambda, List *args) {
     debug("Applying lambda");
     interpreter_enter_scope(interpreter);
-    Interpreter *i = interpreter_assign_args(
+    Interpreter *i1 = interpreter_assign_args(
         interpreter,
         lambda->arg_names,
         args
     );
-    check(i, "Error whilst assigning args");
+    check(i1 != NULL, "Error whilst assigning args");
 
     Object *result = interpret(interpreter, lambda->body);
-    interpreter_leave_scope(interpreter);
+    Interpreter *i2 = interpreter_leave_scope(interpreter);
+    check(i2 != NULL, "Error whilst leaving scope");
     return result;
 error:
     if (interpreter->error == 0) {

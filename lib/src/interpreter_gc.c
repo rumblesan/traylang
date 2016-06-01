@@ -30,6 +30,7 @@ void interpreter_gc(Interpreter *interpreter) {
 
 int mark_variable(HashmapNode *node) {
     Object *obj = node->data;
+    check(obj != NULL, "Attempted to mark NULL Variable");
     object_mark(obj);
     return 0;
 }
@@ -38,6 +39,7 @@ int mark_scopes(Stack *scopes) {
     StackFrame *frame;
     STACK_FOREACH(scopes, el) {
         frame = el->value;
+        check(frame != NULL, "Attempted to mark NULL StackFrame");
         hashmap_traverse(
             frame->variables,
             mark_variable
@@ -48,8 +50,11 @@ int mark_scopes(Stack *scopes) {
 
 void interpreter_gc_mark(Interpreter *interpreter) {
     debug("Marking stack objects");
+    Object *obj;
     STACK_FOREACH(interpreter->call_stack, el) {
-        object_mark(el->value);
+        obj = el->value;
+        check(obj != NULL, "Attempted to mark NULL Object");
+        object_mark(obj);
     }
     mark_scopes(interpreter->scopes);
     debug("Marking globals objects");
@@ -59,12 +64,17 @@ void interpreter_gc_mark(Interpreter *interpreter) {
 void interpreter_gc_sweep(Interpreter *interpreter) {
     debug("Sweeping");
     List *objects = interpreter->objects;
+    if (list_count(objects) < 1) {
+        return;
+    }
     ListNode *node = objects->first;
+    check(node != NULL, "Attempted to mark NULL Object");
     ListNode *next_node;
     Object *obj;
     while(node) {
         next_node = node->next;
         obj = node->value;
+        check(obj != NULL, "Attempted to sweep NULL Object");
 
         if (obj->marked == 0) {
             if (node == objects->first) {
