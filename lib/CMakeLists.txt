@@ -13,17 +13,9 @@ add_flex_bison_dependency(TRLLexer TRLParser)
 set(HEADERS
     "include/traylang.h"
     "include/traylang_ffi.h"
-    "include/ast.h"
-    "include/ast-print.h"
     "include/interpreter.h"
-    "include/interpreter_funcs.h"
-    "include/interpreter_gc.h"
-    "include/interpreter_stackframe.h"
     "include/object.h"
-    "include/parser.h"
-    "include/stdlib/list.h"
-    "include/stdlib/math.h"
-    "include/stdlib/print.h"
+    "include/ast.h"
    )
 set(SOURCES
     "src/traylang.c"
