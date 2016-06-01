@@ -44,12 +44,6 @@ error:
     return NULL;
 }
 
-int globals_hashmap_object_destroy(HashmapNode *node) {
-    Object *obj = node->data;
-    object_destroy(obj);
-    return 0;
-}
-
 void interpreter_destroy(Interpreter *interpreter) {
     if (interpreter) {
         if (interpreter->globals) {
@@ -90,6 +84,7 @@ Interpreter *interpreter_enter_scope(Interpreter *interpreter) {
     stack_push(interpreter->scopes, stackframe);
     return interpreter;
 error:
+    interpreter_error(interpreter, bfromcstr("Could not enter scope"));
     return NULL;
 }
 
