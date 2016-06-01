@@ -3,6 +3,7 @@
 #include "interpreter_gc.h"
 
 #include "interpreter.h"
+#include "interpreter_funcs.h"
 #include "interpreter_stackframe.h"
 #include "object.h"
 #include "object_funcs.h"
@@ -33,6 +34,8 @@ int mark_variable(HashmapNode *node) {
     check(obj != NULL, "Attempted to mark NULL Variable");
     object_mark(obj);
     return 0;
+error:
+    return 0;
 }
 
 int mark_scopes(Stack *scopes) {
@@ -45,6 +48,8 @@ int mark_scopes(Stack *scopes) {
             mark_variable
         );
     }
+    return 0;
+error:
     return 0;
 }
 
@@ -59,6 +64,10 @@ void interpreter_gc_mark(Interpreter *interpreter) {
     mark_scopes(interpreter->scopes);
     debug("Marking globals objects");
     hashmap_traverse(interpreter->globals, mark_variable);
+    return;
+error:
+    interpreter_error(interpreter, bfromcstr("Error whilst marking objects"));
+    return;
 }
 
 void interpreter_gc_sweep(Interpreter *interpreter) {
@@ -98,5 +107,9 @@ void interpreter_gc_sweep(Interpreter *interpreter) {
 
         node = next_node;
     }
+    return;
+error:
+    interpreter_error(interpreter, bfromcstr("Error whilst collecting garbage"));
+    return;
 }
 
