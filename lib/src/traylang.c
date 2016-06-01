@@ -3,8 +3,10 @@
 #include "dbg.h"
 
 #include "traylang.h"
+
 #include "interpreter.h"
 #include "interpreter_funcs.h"
+#include "interpreter_interpret.h"
 #include "object_funcs.h"
 #include "parser.h"
 #include "ast.h"
