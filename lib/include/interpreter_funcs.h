@@ -1,5 +1,5 @@
-#ifndef INTERPRETER_FUNCS_H
-#define INTERPRETER_FUNCS_H
+#ifndef TRAYLANG_INTERPRETER_FUNCS_H
+#define TRAYLANG_INTERPRETER_FUNCS_H
 
 #include "interpreter.h"
 

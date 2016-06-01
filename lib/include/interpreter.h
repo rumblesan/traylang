@@ -1,5 +1,5 @@
-#ifndef INTERPRETER_H
-#define INTERPRETER_H
+#ifndef TRAYLANG_INTERPRETER_H
+#define TRAYLANG_INTERPRETER_H
 
 #include "bclib/hashmap.h"
 #include "bclib/stack.h"

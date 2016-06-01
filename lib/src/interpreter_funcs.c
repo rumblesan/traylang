@@ -7,6 +7,7 @@
 #include "interpreter.h"
 #include "interpreter_stackframe.h"
 #include "object.h"
+#include "object_funcs.h"
 
 #include "bclib/hashmap.h"
 #include "bclib/stack.h"

@@ -2,10 +2,13 @@
 
 #include "dbg.h"
 
+#include "object_funcs.h"
+
+#include "object.h"
 #include "interpreter.h"
 #include "interpreter_gc.h"
-#include "object.h"
 #include "ast.h"
+
 #include "bclib/list.h"
 
 Object *object_create(Interpreter *interpreter) {

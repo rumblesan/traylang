@@ -23,7 +23,7 @@ set(SOURCES
     "src/interpreter_funcs.c"
     "src/interpreter_gc.c"
     "src/interpreter_stackframe.c"
-    "src/object.c"
+    "src/object_funcs.c"
     "src/ast.c"
     "src/ast-print.c"
     "src/stdlib/math.c"

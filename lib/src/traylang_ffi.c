@@ -6,6 +6,7 @@
 #include "interpreter_funcs.h"
 #include "bclib/bstrlib.h"
 #include "object.h"
+#include "object_funcs.h"
 
 TrayLang *traylang_add_function(TrayLang *tray, char *name, c_func function) {
     TrayObject *obj = interpreter_set_global(

@@ -3,6 +3,7 @@
 #include "interpreter.h"
 #include "interpreter_funcs.h"
 #include "object.h"
+#include "object_funcs.h"
 
 Object *add(Interpreter *interpreter, int arg_num) {
     Object *v1 = get_obj(interpreter);

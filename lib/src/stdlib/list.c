@@ -3,6 +3,7 @@
 #include "interpreter.h"
 #include "interpreter_funcs.h"
 #include "object.h"
+#include "object_funcs.h"
 #include "bclib/list.h"
 
 Object *list(Interpreter *interpreter, int arg_num) {
