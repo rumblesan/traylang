@@ -21,11 +21,14 @@ Object *interpret_block(Interpreter *interpreter, Block *block) {
     Object *return_val = NULL;
     LIST_FOREACH(block->elements, first, next, cur) {
         return_val = interpret_element(interpreter, cur->value);
-        check(return_val, "Error interpreting element");
+        check(return_val != NULL, "Error interpreting element");
         check(interpreter->error != 1, "Error whilst interpreting");
     }
     return return_val;
 error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting block"));
+    }
     return NULL;
 }
 
@@ -56,7 +59,7 @@ Object *interpret_lambda(Interpreter *interpreter, Lambda *lambda) {
         list_push(arg_names, bstrcpy(cur->value));
     }
     Object *lambda_object = object_lambda(interpreter, arg_names, lambda->body);
-    check(lambda_object, "Error evaluating vardef");
+    check(lambda_object, "Error evaluating lambda");
     return lambda_object;
 error:
     if (interpreter->error == 0) {
@@ -75,6 +78,9 @@ Stack *interpreter_push_args(Interpreter *interpreter, List *args) {
     }
     return interpreter->call_stack;
 error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error pushing args"));
+    }
     return NULL;
 }
 
@@ -98,10 +104,9 @@ Interpreter *interpreter_assign_args(Interpreter *interpreter, List *arg_names, 
     }
     return interpreter;
 error:
-    interpreter_error(
-        interpreter,
-        bfromcstr("Error assigning args")
-    );
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error assigning args"));
+    }
     return NULL;
 }
 
@@ -131,6 +136,9 @@ Object *interpret_application(Interpreter *interpreter, Application *application
     check(interpreter->error != 1, "Error whilst interpreting");
     return result;
 error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting application"));
+    }
     return NULL;
 }
 
@@ -143,6 +151,9 @@ Object *interpret_call_c_function(Interpreter *interpreter, c_func func, List *a
     interpreter_leave_scope(interpreter);
     return result;
 error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error calling C function"));
+    }
     return NULL;
 }
 
@@ -160,6 +171,9 @@ Object *interpret_call_lambda(Interpreter *interpreter, LambdaObject *lambda, Li
     interpreter_leave_scope(interpreter);
     return result;
 error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error calling lambda"));
+    }
     return NULL;
 }
 
@@ -196,7 +210,7 @@ Object *interpret_number(Interpreter *interpreter, Number *number) {
     return dv;
 error:
     if (interpreter->error == 0) {
-        interpreter_error(interpreter, bfromcstr("Error whilst creating number object"));
+        interpreter_error(interpreter, bfromcstr("Error interpreting number"));
     }
     return NULL;
 }
@@ -207,7 +221,7 @@ Object *interpret_string(Interpreter *interpreter, String *string) {
     return dv;
 error:
     if (interpreter->error == 0) {
-        interpreter_error(interpreter, bfromcstr("Error whilst creating number object"));
+        interpreter_error(interpreter, bfromcstr("Error interpreting number"));
     }
     return NULL;
 }
