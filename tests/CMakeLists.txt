@@ -2,6 +2,7 @@ include_directories(include)
 
 set(TEST_SOURCES
     "src/test_interpreter.c"
+    "src/test_interpreter_gc.c"
     )
 
 foreach(TEST_FILE ${TEST_SOURCES})
