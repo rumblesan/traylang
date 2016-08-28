@@ -11,6 +11,7 @@
 
 "def"                         return DEFINE;
 "lambda"                      return LAMBDA;
+"let"                         return LET;
 
 "("                           return OPAREN;
 ")"                           return CPAREN;

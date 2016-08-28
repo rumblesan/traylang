@@ -193,6 +193,10 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression) {
             debug("interpret lambda");
             v = interpret_lambda(interpreter, expression->lambda);
             break;
+        case LETEXPR:
+            debug("interpret let");
+            v = interpret_let(interpreter, expression->let);
+            break;
         case NUMBEREXPR:
             debug("interpret number");
             v = interpret_number(interpreter, expression->number);
@@ -231,3 +235,37 @@ error:
     return NULL;
 }
 
+Object *interpret_let(Interpreter *interpreter, Let *let) {
+    Object *let_value = NULL;
+    interpreter_enter_scope(interpreter);
+    LIST_FOREACH(let->variable_expressions, first, next, cur) {
+        let_value = interpret_let_variable(interpreter, cur->value);
+        check(interpreter->error != 1, "Error interpreting let expression");
+        check(let_value != NULL, "Error evaluating let expression");
+    }
+    Object *expr_value = interpret_expression(interpreter, let->expr);
+    Interpreter *i2 = interpreter_leave_scope(interpreter);
+    check(expr_value != NULL, "Error evaluating let expression");
+    check(interpreter->error != 1, "Error interpreting let expression");
+    check(i2 != NULL, "Error whilst leaving scope");
+    return expr_value;
+error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting let expression"));
+    }
+    return NULL;
+}
+
+Object *interpret_let_variable(Interpreter *interpreter, LetVariable *letVariable) {
+    Object *expr_value = interpret_expression(interpreter, letVariable->expr);
+    check(interpreter->error != 1, "Error interpreting let variable");
+    check(expr_value != NULL, "Error evaluating let variable");
+    interpreter_set_variable(interpreter, bstrcpy(letVariable->name), expr_value);
+    check(interpreter->error != 1, "Error interpreting let variable");
+    return expr_value;
+error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting let variable"));
+    }
+    return NULL;
+}

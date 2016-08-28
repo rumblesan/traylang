@@ -62,6 +62,8 @@ int parse_string(Block **ast, bstring program) {
     Lambda        *lambdaNode;
     VarDefinition *varDefNode;
     Expression    *expressionNode;
+    Let           *letNode;
+    LetVariable   *letVariableNode;
     Number        *numberNode;
     Variable      *variableNode;
     Identifier    *identifier;
@@ -71,6 +73,7 @@ int parse_string(Block **ast, bstring program) {
 
 %token DEFINE
 %token LAMBDA
+%token LET
 %token OPAREN
 %token CPAREN
 %token DQUOTE
@@ -84,8 +87,11 @@ int parse_string(Block **ast, bstring program) {
 %type<applicationNode> application
 %type<listNode> argList
 %type<listNode> argNamesList
+%type<listNode> letVarList
+%type<letVariableNode> letVar
 %type<lambdaNode> lambda
 %type<varDefNode> vardefinition
+%type<letNode> let
 %type<expressionNode> expression
 %type<variableNode> variable
 
@@ -181,6 +187,10 @@ expression: variable
           {
               $$ = ast_application_expression($1);
           }
+          | let
+          {
+              $$ = ast_let_expression($1);
+          }
           ;
 
 variable: IDENTIFIER
@@ -188,4 +198,27 @@ variable: IDENTIFIER
             $$ = ast_variable_create($1);
         }
         ;
+
+let: OPAREN LET OPAREN letVarList CPAREN expression CPAREN
+          {
+               $$ = ast_let_create($4, $6);
+          }
+          ;
+
+letVarList: %empty
+          {
+              $$ = list_create();
+          }
+          | letVarList letVar
+          {
+              $$ = list_push($1, $2);
+          }
+          ;
+
+letVar: OPAREN IDENTIFIER expression CPAREN
+      {
+          $$ = ast_let_variable_create($2, $3);
+      }
+      ;
+
 %%
