@@ -44,6 +44,7 @@ void ast_vardef_print(VarDefinition *vardef, int indentation) {
 void ast_application_print(Application *application, int indentation) {
     indent(indentation);
     printf("Application\n");
+    ast_expression_print(application->expr, indentation + DEPTH);
     ast_arg_list_print(application->args, indentation + DEPTH);
 }
 
