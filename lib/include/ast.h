@@ -55,6 +55,32 @@ Variable *ast_variable_create(bstring name);
 
 void ast_variable_cleanup(Variable *variable);
 
+/* Let AST Node */
+typedef struct Let {
+
+    List *variable_expressions;
+
+    struct Expression *expr;
+
+} Let;
+
+Let *ast_let_create(List *variable_expressions, struct Expression *expr);
+
+void ast_let_cleanup(Let *let);
+
+/* Let AST Node */
+typedef struct LetVariable {
+
+    bstring name;
+
+    struct Expression *expr;
+
+} LetVariable;
+
+LetVariable *ast_let_variable_create(bstring name, struct Expression *expr);
+
+void ast_let_variable_cleanup(LetVariable *let_variable);
+
 /* Application AST Node */
 typedef struct Application {
 
@@ -69,7 +95,7 @@ Application *ast_application_create(struct Expression *expr, List *args);
 void ast_application_cleanup(Application *application);
 
 /* Expression AST Node */
-typedef enum {APPLICATIONEXPR, NUMBEREXPR, STRINGEXPR, VARIABLEEXPR, LAMBDAEXPR} ExpressionType;
+typedef enum {APPLICATIONEXPR, LETEXPR, NUMBEREXPR, STRINGEXPR, VARIABLEEXPR, LAMBDAEXPR} ExpressionType;
 
 typedef struct Expression {
 
@@ -77,6 +103,7 @@ typedef struct Expression {
 
     union {
         Application *application;
+        Let *let;
         Number *number;
         String *string;
         Variable *variable;
@@ -90,6 +117,8 @@ Expression *ast_expression_create();
 void ast_expression_cleanup(Expression *expression);
 
 Expression *ast_application_expression(Application *application);
+
+Expression *ast_let_expression(Let *let);
 
 Expression *ast_number_expression(Number *number);
 

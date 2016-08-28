@@ -96,6 +96,9 @@ void ast_expression_cleanup(Expression *expression) {
         case APPLICATIONEXPR:
             ast_application_cleanup(expression->application);
             break;
+        case LETEXPR:
+            ast_let_cleanup(expression->let);
+            break;
         case NUMBEREXPR:
             ast_number_cleanup(expression->number);
             break;
@@ -116,6 +119,13 @@ Expression *ast_application_expression(Application *application) {
     Expression *expression = ast_expression_create();
     expression->expressionType = APPLICATIONEXPR;
     expression->application = application;
+    return expression;
+}
+
+Expression *ast_let_expression(Let *let) {
+    Expression *expression = ast_expression_create();
+    expression->expressionType = LETEXPR;
+    expression->let = let;
     return expression;
 }
 
@@ -201,5 +211,37 @@ void ast_lambda_cleanup(Lambda *lambda) {
     }
     ast_block_cleanup(lambda->body);
     free(lambda);
+}
+
+/* LetVariable AST Node */
+LetVariable *ast_let_variable_create(bstring name, struct Expression *expr) {
+    LetVariable *let_variable = malloc(sizeof(LetVariable));
+    let_variable->name = name;
+    let_variable->expr = expr;
+    return let_variable;
+}
+
+void ast_let_variable_cleanup(LetVariable *let_variable) {
+    bdestroy(let_variable->name);
+    ast_expression_cleanup(let_variable->expr);
+    free(let_variable);
+}
+
+/* Let AST Node */
+Let *ast_let_create(List *variable_expressions, struct Expression *expr) {
+    Let *let = malloc(sizeof(Let));
+    let->variable_expressions = variable_expressions;
+    let->expr = expr;
+    return let;
+}
+
+void ast_let_cleanup(Let *let) {
+    LetVariable *let_var;
+    LIST_FOREACH(let->variable_expressions, first, next, cur) {
+        let_var = cur->value;
+        ast_let_variable_cleanup(let_var);
+    }
+    ast_expression_cleanup(let->expr);
+    free(let);
 }
 

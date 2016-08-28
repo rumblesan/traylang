@@ -18,6 +18,10 @@ void ast_arg_list_print(List *list, int indentation);
 
 void ast_expression_print(Expression *expression, int indentation);
 
+void ast_let_print(Let *let, int indentation);
+
+void ast_let_variable_print(LetVariable *letVar, int indentation);
+
 void ast_number_print(Number *number, int indentation);
 
 void ast_string_print(String *string, int indentation);

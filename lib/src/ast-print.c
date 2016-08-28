@@ -63,6 +63,9 @@ void ast_expression_print(Expression *expression, int indentation) {
         case APPLICATIONEXPR:
             ast_application_print(expression->application, indentation + DEPTH);
             break;
+        case LETEXPR:
+            ast_let_print(expression->let, indentation + DEPTH);
+            break;
         case NUMBEREXPR:
             ast_number_print(expression->number, indentation + DEPTH);
             break;
@@ -76,6 +79,22 @@ void ast_expression_print(Expression *expression, int indentation) {
             ast_lambda_print(expression->lambda, indentation + DEPTH);
             break;
     }
+}
+
+void ast_let_print(Let *let, int indentation) {
+    indent(indentation);
+    printf("Let\n");
+    LIST_FOREACH(let->variable_expressions, first, next, cur) {
+      ast_let_variable_print(cur->value, indentation + DEPTH);
+    }
+    ast_expression_print(let->expr, indentation + DEPTH);
+}
+
+void ast_let_variable_print(LetVariable *let_variable, int indentation) {
+    indent(indentation);
+    bstring name = let_variable->name;
+    printf("%s:\n", bdata(name));
+    ast_expression_print(let_variable->expr, indentation + DEPTH);
 }
 
 void ast_number_print(Number *number, int indentation) {
