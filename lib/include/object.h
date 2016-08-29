@@ -19,7 +19,7 @@ typedef enum {
 typedef struct LambdaObject {
     List *arg_names;
 
-    Block *body;
+    List *body;
 } LambdaObject;
 
 typedef struct Object *(*c_func)(Interpreter *interpreter, int arg_count);

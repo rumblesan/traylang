@@ -4,70 +4,76 @@
 #include "bclib/list.h"
 #include "bclib/bstrlib.h"
 
-/* Block AST Node */
-Block *ast_block_create(List *elements) {
-    Block *block = malloc(sizeof(Block));
-    block->elements = elements;
-    return block;
+/* TODO
+ * Add proper error handling
+ */
+
+/* Program AST Node */
+Program *ast_program_create(List *forms) {
+    Program *program = malloc(sizeof(Program));
+    program->forms = forms;
+    return program;
 }
 
-void ast_block_cleanup(Block *block) {
-    LIST_FOREACH(block->elements, first, next, cur) {
-        ast_element_cleanup(cur->value);
+void ast_program_cleanup(Program *program) {
+    LIST_FOREACH(program->forms, first, next, cur) {
+        ast_form_cleanup(cur->value);
     }
-    free(block);
+    free(program);
 }
 
-/* Element AST Node */
-Element *ast_element_create() {
-    Element *element = malloc(sizeof(Element));
-    return element;
+/* Form AST Node */
+Form *ast_form_create() {
+    Form *form = malloc(sizeof(Form));
+    return form;
 }
 
-void ast_element_cleanup(Element *element) {
-    switch(element->elementType) {
-        case VARDEFINITIONEL:
-            ast_vardef_cleanup(element->varDefinition);
+void ast_form_cleanup(Form *form) {
+    switch(form->formType) {
+        case DEFINITIONFORM:
+            ast_definition_cleanup(form->definition);
             break;
-        case APPLICATIONEL:
-            ast_application_cleanup(element->application);
+        case EXPRESSIONFORM:
+            ast_expression_cleanup(form->expression);
             break;
     }
-    free(element);
+    free(form);
 }
 
-Element *ast_application_element(Application *application) {
-    Element *element = ast_element_create();
-    element->elementType = APPLICATIONEL;
-    element->application = application;
-    return element;
+Form *ast_definition_form(Definition *definition) {
+    Form *form = ast_form_create();
+    form->formType = DEFINITIONFORM;
+    form->definition = definition;
+    return form;
 }
 
-Element *ast_vardefinition_element(VarDefinition *varDefinition) {
-    Element *element = ast_element_create();
-    element->elementType = VARDEFINITIONEL;
-    element->varDefinition = varDefinition;
-    return element;
+Form *ast_expression_form(Expression *expression) {
+    Form *form = ast_form_create();
+    form->formType = EXPRESSIONFORM;
+    form->expression = expression;
+    return form;
 }
 
-/* Application AST Node */
-Application *ast_application_create(Expression *expr, List *args) {
-    Application *application = malloc(sizeof(Application));
-    application->expr = expr;
-    application->args = args;
-
-    return application;
+/* Definition AST Node */
+Definition *ast_definition_create() {
+    Definition *definition = malloc(sizeof(Definition));
+    return definition;
 }
 
-void ast_application_cleanup(Application *application) {
-    ast_expression_cleanup(application->expr);
-    bstring argname;
-    LIST_FOREACH(application->args, first, next, cur) {
-        argname = cur->value;
-        bdestroy(argname);
+void ast_definition_cleanup(Definition *definition) {
+    switch(definition->definitionType) {
+        case VARIABLEDEFINITION:
+            ast_vardef_cleanup(definition->varDefinition);
+            break;
     }
-    list_destroy(application->args);
-    free(application);
+    free(definition);
+}
+
+Definition *ast_variable_definition(VarDefinition *varDefinition) {
+    Definition *definition = ast_definition_create();
+    definition->definitionType = VARIABLEDEFINITION;
+    definition->varDefinition = varDefinition;
+    return definition;
 }
 
 /* Variable Definition AST Node */
@@ -115,6 +121,12 @@ void ast_expression_cleanup(Expression *expression) {
     free(expression);
 }
 
+void ast_expression_list_cleanup(List *expressions) {
+    LIST_FOREACH(expressions, first, next, cur) {
+        ast_expression_cleanup(cur->value);
+    }
+}
+
 Expression *ast_application_expression(Application *application) {
     Expression *expression = ast_expression_create();
     expression->expressionType = APPLICATIONEXPR;
@@ -157,6 +169,26 @@ Expression *ast_lambda_expression(Lambda *lambda) {
     return expression;
 }
 
+/* Application AST Node */
+Application *ast_application_create(Expression *expr, List *args_expressions) {
+    Application *application = malloc(sizeof(Application));
+    application->expr = expr;
+    application->args_expressions = args_expressions;
+
+    return application;
+}
+
+void ast_application_cleanup(Application *application) {
+    ast_expression_cleanup(application->expr);
+    bstring argname;
+    LIST_FOREACH(application->args_expressions, first, next, cur) {
+        argname = cur->value;
+        bdestroy(argname);
+    }
+    list_destroy(application->args_expressions);
+    free(application);
+}
+
 /* Number Literal AST Node */
 Number *ast_number_create(double value) {
     Number *number = malloc(sizeof(Number));
@@ -196,7 +228,7 @@ void ast_variable_cleanup(Variable *variable) {
 }
 
 /* Lambda AST Node */
-Lambda *ast_lambda_create(List *arg_names, Block *body) {
+Lambda *ast_lambda_create(List *arg_names, List *body) {
     Lambda *lambda = malloc(sizeof(Lambda));
     lambda->arg_names = arg_names;
     lambda->body = body;
@@ -209,39 +241,38 @@ void ast_lambda_cleanup(Lambda *lambda) {
         argname = cur->value;
         bdestroy(argname);
     }
-    ast_block_cleanup(lambda->body);
+    ast_expression_list_cleanup(lambda->body);
     free(lambda);
 }
 
-/* LetVariable AST Node */
-LetVariable *ast_let_variable_create(bstring name, struct Expression *expr) {
-    LetVariable *let_variable = malloc(sizeof(LetVariable));
-    let_variable->name = name;
-    let_variable->expr = expr;
-    return let_variable;
+LetBinding *ast_let_binding_create(bstring name, Expression *expression) {
+    LetBinding *letBinding = malloc(sizeof(LetBinding));
+    letBinding->name = name;
+    letBinding->expression = expression;
+    return letBinding;
 }
 
-void ast_let_variable_cleanup(LetVariable *let_variable) {
-    bdestroy(let_variable->name);
-    ast_expression_cleanup(let_variable->expr);
-    free(let_variable);
+void ast_let_binding_cleanup(LetBinding *letBinding) {
+    bdestroy(letBinding->name);
+    ast_expression_cleanup(letBinding->expression);
+    free(letBinding);
 }
 
 /* Let AST Node */
-Let *ast_let_create(List *variable_expressions, struct Expression *expr) {
+Let *ast_let_create(List *bindings, List *expressions) {
     Let *let = malloc(sizeof(Let));
-    let->variable_expressions = variable_expressions;
-    let->expr = expr;
+    let->bindings = bindings;
+    let->expressions = expressions;
     return let;
 }
 
 void ast_let_cleanup(Let *let) {
-    LetVariable *let_var;
-    LIST_FOREACH(let->variable_expressions, first, next, cur) {
-        let_var = cur->value;
-        ast_let_variable_cleanup(let_var);
+    LetBinding *letBinding;
+    LIST_FOREACH(let->bindings, first, next, cur) {
+        letBinding = cur->value;
+        ast_let_binding_cleanup(letBinding);
     }
-    ast_expression_cleanup(let->expr);
+    ast_expression_list_cleanup(let->expressions);
     free(let);
 }
 

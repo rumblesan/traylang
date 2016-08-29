@@ -14,11 +14,11 @@
 
 #include "bclib/bstrlib.h"
 
-void yyerror(yyscan_t scanner, Block **ast, const char *str) {
+void yyerror(yyscan_t scanner, Program **ast, const char *str) {
     fprintf(stderr, "error: %s\n", str);
 }
 
-int parse(Block **ast, FILE *fp) {
+int parse(Program **ast, FILE *fp) {
 
     yyscan_t scanner;
 
@@ -32,7 +32,7 @@ int parse(Block **ast, FILE *fp) {
     return parseResult;
 }
 
-int parse_string(Block **ast, bstring program) {
+int parse_string(Program **ast, bstring program) {
 
     yyscan_t scanner;
 
@@ -51,19 +51,20 @@ int parse_string(Block **ast, bstring program) {
 %define parse.error verbose
 %define api.pure full
 %lex-param {void *scanner}
-%parse-param {void *scanner} {Block **ast}
+%parse-param {void *scanner} {Program **ast}
 
 %union {
-    Block         *blockNode;
-    List          *elementsNode;
-    Element       *elementNode;
+    Program       *programNode;
+    List          *formsNode;
+    Form          *formNode;
+    Definition    *definitionNode;
+    VarDefinition *varDefNode;
+    Expression    *expressionNode;
     Application   *applicationNode;
     List          *listNode;
     Lambda        *lambdaNode;
-    VarDefinition *varDefNode;
-    Expression    *expressionNode;
     Let           *letNode;
-    LetVariable   *letVariableNode;
+    LetBinding    *letBindingNode;
     Number        *numberNode;
     Variable      *variableNode;
     Identifier    *identifier;
@@ -81,86 +82,63 @@ int parse_string(Block **ast, bstring program) {
 %token<number> NUMBER
 %token<string> STRING
 %token<identifier> IDENTIFIER
-%type<blockNode> body
-%type<elementsNode> elements
-%type<elementNode> element
+%type<programNode> program
+%type<formNode> form
+%type<listNode> forms
+%type<definitionNode> definition
+%type<varDefNode> vardefinition
+%type<expressionNode> expression
+%type<listNode> expressionList
 %type<applicationNode> application
 %type<listNode> argList
 %type<listNode> argNamesList
-%type<listNode> letVarList
-%type<letVariableNode> letVar
+%type<listNode> letBindingList
+%type<letBindingNode> letBinding
 %type<lambdaNode> lambda
-%type<varDefNode> vardefinition
 %type<letNode> let
-%type<expressionNode> expression
 %type<variableNode> variable
 
 %%
-body: elements
+program: forms
     {
-        Block *block = ast_block_create($1);
-        *ast = block;
-        $$ = block;
+        Program *program = ast_program_create($1);
+        *ast = program;
+        $$ = program;
     }
     ;
 
-elements: %empty
-        {
-            $$ = list_create();
-        }
-        | elements element
-        {
-            $$ = list_push($1, $2);
-        }
-        ;
+forms: %empty
+     {
+         $$ = list_create();
+     }
+     | forms form
+     {
+         $$ = list_push($1, $2);
+     }
+     ;
 
-element: application
-       {
-           $$ = ast_application_element($1);
-       }
-       | vardefinition
-       {
-           $$ = ast_vardefinition_element($1);
-       }
-       ;
+form: definition
+    {
+        $$ = ast_definition_form($1);
+    }
+    | expression
+    {
+        $$ = ast_expression_form($1);
+    }
+    ;
 
-application: OPAREN expression argList CPAREN
-           {
-               $$ = ast_application_create($2, $3);
-           }
-           ;
-
-argList: %empty
-       {
-           $$ = list_create();
-       }
-       | argList expression
-       {
-           $$ = list_push($1, $2);
-       }
-       ;
-
-argNamesList: %empty
-       {
-           $$ = list_create();
-       }
-       | argNamesList IDENTIFIER
-       {
-           $$ = list_push($1, $2);
-       }
-       ;
-
-lambda: OPAREN LAMBDA OPAREN argNamesList CPAREN OPAREN body CPAREN CPAREN
-       {
-           $$ = ast_lambda_create($4, $7);
-       }
-       ;
+definition: vardefinition
+          {
+              $$ = ast_variable_definition($1);
+          }
+          ;
 
 vardefinition: OPAREN DEFINE IDENTIFIER expression CPAREN
           {
                $$ = ast_vardef_create($3, $4);
           }
           ;
+
 
 expression: variable
           {
@@ -193,32 +171,74 @@ expression: variable
           }
           ;
 
+expressionList: %empty
+              {
+                  $$ = list_create();
+              }
+              | expressionList expression
+              {
+                  $$ = list_push($1, $2);
+              }
+              ;
+
+application: OPAREN expression argList CPAREN
+           {
+               $$ = ast_application_create($2, $3);
+           }
+           ;
+
+argList: %empty
+       {
+           $$ = list_create();
+       }
+       | argList expression
+       {
+           $$ = list_push($1, $2);
+       }
+       ;
+
+argNamesList: %empty
+       {
+           $$ = list_create();
+       }
+       | argNamesList IDENTIFIER
+       {
+           $$ = list_push($1, $2);
+       }
+       ;
+
+lambda: OPAREN LAMBDA OPAREN argNamesList CPAREN OPAREN forms CPAREN CPAREN
+       {
+           $$ = ast_lambda_create($4, $7);
+       }
+       ;
+
 variable: IDENTIFIER
         {
             $$ = ast_variable_create($1);
         }
         ;
 
-let: OPAREN LET OPAREN letVarList CPAREN expression CPAREN
+let: OPAREN LET OPAREN letBindingList CPAREN expressionList CPAREN
           {
                $$ = ast_let_create($4, $6);
           }
           ;
 
-letVarList: %empty
+letBindingList: %empty
+              {
+                  $$ = list_create();
+              }
+              | letBindingList letBinding
+              {
+                  $$ = list_push($1, $2);
+              }
+              ;
+
+letBinding: OPAREN IDENTIFIER expression CPAREN
           {
-              $$ = list_create();
-          }
-          | letVarList letVar
-          {
-              $$ = list_push($1, $2);
+              $$ = ast_let_binding_create($2, $3);
           }
           ;
-
-letVar: OPAREN IDENTIFIER expression CPAREN
-      {
-          $$ = ast_let_variable_create($2, $3);
-      }
-      ;
 
 %%

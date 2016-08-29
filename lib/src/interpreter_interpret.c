@@ -13,29 +13,35 @@
 #include "bclib/stack.h"
 #include "bclib/bstrlib.h"
 
-Object *interpret(Interpreter *interpreter, Block *block) {
-    return interpret_block(interpreter, block);
+Object *interpret(Interpreter *interpreter, Program *program) {
+    return interpret_program(interpreter, program);
 }
 
-Object *interpret_block(Interpreter *interpreter, Block *block) {
+Object *interpret_program(Interpreter *interpreter, Program *program) {
     Object *return_val = NULL;
-    LIST_FOREACH(block->elements, first, next, cur) {
-        return_val = interpret_element(interpreter, cur->value);
-        check(return_val != NULL, "Error interpreting element");
+    LIST_FOREACH(program->forms, first, next, cur) {
+        return_val = interpret_form(interpreter, cur->value);
+        check(return_val != NULL, "Error interpreting form");
         check(interpreter->error != 1, "Error whilst interpreting");
     }
     return return_val;
 error:
     if (interpreter->error == 0) {
-        interpreter_error(interpreter, bfromcstr("Error interpreting block"));
+        interpreter_error(interpreter, bfromcstr("Error interpreting form"));
     }
     return NULL;
 }
 
-Object *interpret_element(Interpreter *interpreter, Element *element) {
-    switch(element->elementType) {
-        case VARDEFINITIONEL: return interpret_vardef(interpreter, element->varDefinition); break;
-        case APPLICATIONEL:   return interpret_application(interpreter, element->application); break;
+Object *interpret_form(Interpreter *interpreter, Form *form) {
+    switch(form->formType) {
+        case DEFINITIONFORM: return interpret_definition(interpreter, form->definition); break;
+        case EXPRESSIONFORM: return interpret_expression(interpreter, form->expression); break;
+    }
+}
+
+Object *interpret_definition(Interpreter *interpreter, Definition *definition) {
+    switch(definition->definitionType) {
+        case VARIABLEDEFINITION: return interpret_vardef(interpreter, definition->varDefinition); break;
     }
 }
 
@@ -112,19 +118,19 @@ error:
 }
 
 Object *interpret_application(Interpreter *interpreter, Application *application) {
-    debug("Application - arg num: %d", list_count(application->args));
+    debug("Application - arg num: %d", list_count(application->args_expressions));
 
     Object *func_obj = interpret_expression(interpreter, application->expr);
     Object *result;
     switch(func_obj->type) {
         case CFUNCTION:
             result = interpret_call_c_function(
-                interpreter, func_obj->cfunction, application->args
+                interpreter, func_obj->cfunction, application->args_expressions
             );
             break;
         case LAMBDA:
             result = interpret_call_lambda(
-                interpreter, func_obj->lambda, application->args
+                interpreter, func_obj->lambda, application->args_expressions
             );
             break;
         default:
@@ -171,10 +177,17 @@ Object *interpret_call_lambda(Interpreter *interpreter, LambdaObject *lambda, Li
     );
     check(i1 != NULL, "Error whilst assigning args");
 
-    Object *result = interpret(interpreter, lambda->body);
+    Object *return_val = NULL;
+    LIST_FOREACH(lambda->body, first, next, cur) {
+        return_val = interpret_form(interpreter, cur->value);
+        check(return_val != NULL, "Error interpreting lambda body form");
+        check(interpreter->error != 1, "Error whilst interpreting");
+    }
+    return return_val;
+
     Interpreter *i2 = interpreter_leave_scope(interpreter);
     check(i2 != NULL, "Error whilst leaving scope");
-    return result;
+    return return_val;
 error:
     if (interpreter->error == 0) {
         interpreter_error(interpreter, bfromcstr("Error calling lambda"));
@@ -213,6 +226,21 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression) {
     return v;
 }
 
+Object *interpret_expression_list(Interpreter *interpreter, List *expressions) {
+    Object *return_val = NULL;
+    LIST_FOREACH(expressions, first, next, cur) {
+        return_val = interpret_expression(interpreter, cur->value);
+        check(return_val != NULL, "Error interpreting expression");
+        check(interpreter->error != 1, "Error whilst interpreting");
+    }
+    return return_val;
+error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting expression list"));
+    }
+    return NULL;
+}
+
 Object *interpret_number(Interpreter *interpreter, Number *number) {
     Object *dv = object_number(interpreter, number->value);
     check(dv != NULL, "Could not create object")
@@ -238,17 +266,18 @@ error:
 Object *interpret_let(Interpreter *interpreter, Let *let) {
     Object *let_value = NULL;
     interpreter_enter_scope(interpreter);
-    LIST_FOREACH(let->variable_expressions, first, next, cur) {
-        let_value = interpret_let_variable(interpreter, cur->value);
+    LIST_FOREACH(let->bindings, first, next, cur) {
+        let_value = interpret_let_binding(interpreter, cur->value);
         check(interpreter->error != 1, "Error interpreting let expression");
         check(let_value != NULL, "Error evaluating let expression");
     }
-    Object *expr_value = interpret_expression(interpreter, let->expr);
+
+    Object *return_val = interpret_expression_list(interpreter, let->expressions);
+    check(return_val != NULL, "Error evaluating let expressions");
+
     Interpreter *i2 = interpreter_leave_scope(interpreter);
-    check(expr_value != NULL, "Error evaluating let expression");
-    check(interpreter->error != 1, "Error interpreting let expression");
     check(i2 != NULL, "Error whilst leaving scope");
-    return expr_value;
+    return return_val;
 error:
     if (interpreter->error == 0) {
         interpreter_error(interpreter, bfromcstr("Error interpreting let expression"));
@@ -256,16 +285,16 @@ error:
     return NULL;
 }
 
-Object *interpret_let_variable(Interpreter *interpreter, LetVariable *letVariable) {
-    Object *expr_value = interpret_expression(interpreter, letVariable->expr);
-    check(interpreter->error != 1, "Error interpreting let variable");
-    check(expr_value != NULL, "Error evaluating let variable");
-    interpreter_set_variable(interpreter, bstrcpy(letVariable->name), expr_value);
-    check(interpreter->error != 1, "Error interpreting let variable");
-    return expr_value;
+Object *interpret_let_binding(Interpreter *interpreter, LetBinding *letBinding) {
+    Object *expression_value = interpret_expression(interpreter, letBinding->expression);
+    check(interpreter->error != 1, "Error interpreting let binding");
+    check(expression_value != NULL, "Error evaluating let binding");
+    interpreter_set_variable(interpreter, bstrcpy(letBinding->name), expression_value);
+    check(interpreter->error != 1, "Error interpreting let binding");
+    return expression_value;
 error:
     if (interpreter->error == 0) {
-        interpreter_error(interpreter, bfromcstr("Error interpreting let variable"));
+        interpreter_error(interpreter, bfromcstr("Error interpreting let binding"));
     }
     return NULL;
 }

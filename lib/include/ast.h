@@ -4,8 +4,8 @@
 #include "bclib/list.h"
 #include "bclib/bstrlib.h"
 
-struct Block;
-struct Expression;
+struct Program;
+struct Form;
 
 typedef struct tagbstring Identifier;
 
@@ -36,11 +36,11 @@ typedef struct Lambda {
 
     List *arg_names;
 
-    struct Block *body;
+    List *body;
 
 } Lambda;
 
-Lambda *ast_lambda_create(List *arg_names, struct Block *body);
+Lambda *ast_lambda_create(List *arg_names, List *body);
 
 void ast_lambda_cleanup(Lambda *lambda);
 
@@ -58,39 +58,39 @@ void ast_variable_cleanup(Variable *variable);
 /* Let AST Node */
 typedef struct Let {
 
-    List *variable_expressions;
+    List *bindings;
 
-    struct Expression *expr;
+    List *expressions;
 
 } Let;
 
-Let *ast_let_create(List *variable_expressions, struct Expression *expr);
+Let *ast_let_create(List *variable_expressions, List *expressions);
 
 void ast_let_cleanup(Let *let);
 
 /* Let AST Node */
-typedef struct LetVariable {
+typedef struct LetBinding {
 
     bstring name;
 
-    struct Expression *expr;
+    struct Expression *expression;
 
-} LetVariable;
+} LetBinding;
 
-LetVariable *ast_let_variable_create(bstring name, struct Expression *expr);
+LetBinding *ast_let_binding_create(bstring name, struct Expression *expr);
 
-void ast_let_variable_cleanup(LetVariable *let_variable);
+void ast_let_binding_cleanup(LetBinding *let_binding);
 
 /* Application AST Node */
 typedef struct Application {
 
     struct Expression *expr;
 
-    List *args;
+    List *args_expressions;
 
 } Application;
 
-Application *ast_application_create(struct Expression *expr, List *args);
+Application *ast_application_create(struct Expression *expr, List *args_expressions);
 
 void ast_application_cleanup(Application *application);
 
@@ -142,40 +142,58 @@ VarDefinition *ast_vardef_create(bstring name, Expression *expression);
 
 void ast_vardef_cleanup(VarDefinition *vardef);
 
+/* Definition AST Node */
+typedef enum {VARIABLEDEFINITION} DefinitionType;
 
-/* Element AST Node */
-typedef enum {VARDEFINITIONEL, APPLICATIONEL} ElementType;
+typedef struct Definition {
 
-typedef struct Element {
-
-    ElementType elementType;
+    DefinitionType definitionType;
 
     union {
-        Application   *application;
         VarDefinition *varDefinition;
     };
 
-} Element;
+} Definition;
 
-Element *ast_element_create();
+Definition *ast_defitinion_create();
 
-void ast_element_cleanup(Element *element);
+void ast_definition_cleanup(Definition *definition);
 
-Element *ast_application_element(Application *application);
+Definition *ast_variable_definition(VarDefinition *variableDefinition);
 
-Element *ast_vardefinition_element(VarDefinition *vardefinition);
+/* Form AST Node */
+typedef enum {DEFINITIONFORM, EXPRESSIONFORM} FormType;
+
+typedef struct Form {
+
+    FormType formType;
+
+    union {
+        Definition *definition;
+        Expression *expression;
+    };
+
+} Form;
+
+Form *ast_form_create();
+
+void ast_form_cleanup(Form *form);
+
+Form *ast_definition_form(Definition *definition);
+
+Form *ast_expression_form(Expression *expression);
 
 
 /* Block AST Node */
-typedef struct Block {
+typedef struct Program {
 
-    List *elements;
+    List *forms;
 
-} Block;
+} Program;
 
-Block *ast_block_create(List *nodes);
+Program *ast_program_create(List *forms);
 
-void ast_block_cleanup(Block *block);
+void ast_program_cleanup(Program *program);
 
 
 #endif

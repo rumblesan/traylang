@@ -63,7 +63,7 @@ error:
 
 int traylang_interpret_file(TrayLang *tray, FILE *fp) {
 
-    Block *ast;
+    Program *ast;
 
     int parseResult = parse(&ast, fp);
 
@@ -71,7 +71,7 @@ int traylang_interpret_file(TrayLang *tray, FILE *fp) {
 
     interpret(tray->interpreter, ast);
 
-    ast_block_cleanup(ast);
+    ast_program_cleanup(ast);
 
     check(
         tray->interpreter->error == 0,
@@ -83,17 +83,17 @@ error:
     return 1;
 }
 
-int traylang_interpret_string(TrayLang *tray, bstring program) {
+int traylang_interpret_string(TrayLang *tray, bstring text) {
 
-    Block *ast;
+    Program *ast;
 
-    int parseResult = parse_string(&ast, program);
+    int parseResult = parse_string(&ast, text);
 
     check(parseResult == 0, "Error during parsing");
 
     interpret(tray->interpreter, ast);
 
-    ast_block_cleanup(ast);
+    ast_program_cleanup(ast);
 
     check(
         tray->interpreter->error == 0,

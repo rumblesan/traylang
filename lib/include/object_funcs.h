@@ -10,7 +10,7 @@
 
 Object *object_c_function(Interpreter *interpreter, c_func func);
 
-Object *object_lambda(Interpreter *interpreter, List *arg_names, Block *body);
+Object *object_lambda(Interpreter *interpreter, List *arg_names, List *body);
 
 Object *object_list(Interpreter *interpreter, List *list);
 

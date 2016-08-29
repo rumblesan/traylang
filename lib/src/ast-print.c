@@ -11,26 +11,34 @@ void indent(int i) {
     printf("%*s", i, " ");
 }
 
-void ast_print(Block *block) {
-    ast_block_print(block, 0);
+void ast_print(Program *program) {
+    ast_program_print(program, 0);
 }
 
-void ast_block_print(Block *block, int indentation) {
+void ast_program_print(Program *program, int indentation) {
     indent(indentation);
-    printf("AST Block with %d elements\n", list_count(block->elements));
+    printf("AST Program with %d forms\n", list_count(program->forms));
 
-    LIST_FOREACH(block->elements, first, next, cur) {
-        ast_element_print(cur->value, indentation + DEPTH);
+    LIST_FOREACH(program->forms, first, next, cur) {
+        ast_form_print(cur->value, indentation + DEPTH);
     }
 }
 
-void ast_element_print(Element *element, int indentation) {
-    switch(element->elementType) {
-        case VARDEFINITIONEL:
-            ast_vardef_print(element->varDefinition, indentation + DEPTH);
+void ast_form_print(Form *form, int indentation) {
+    switch(form->formType) {
+        case DEFINITIONFORM:
+            ast_definition_print(form->definition, indentation + DEPTH);
             break;
-        case APPLICATIONEL:
-            ast_application_print(element->application, indentation + DEPTH);
+        case EXPRESSIONFORM:
+            ast_expression_print(form->expression, indentation + DEPTH);
+            break;
+    }
+}
+
+void ast_definition_print(Definition *definition, int indentation) {
+    switch(definition->definitionType) {
+        case VARIABLEDEFINITION:
+            ast_vardef_print(definition->varDefinition, indentation + DEPTH);
             break;
     }
 }
@@ -39,21 +47,6 @@ void ast_vardef_print(VarDefinition *vardef, int indentation) {
     indent(indentation);
     printf("Var Definition: %s\n", vardef->name->data);
     ast_expression_print(vardef->expression, indentation + DEPTH);
-}
-
-void ast_application_print(Application *application, int indentation) {
-    indent(indentation);
-    printf("Application\n");
-    ast_expression_print(application->expr, indentation + DEPTH);
-    ast_arg_list_print(application->args, indentation + DEPTH);
-}
-
-void ast_arg_list_print(List *args, int indentation) {
-    indent(indentation);
-    printf("%d args\n", list_count(args));
-    LIST_FOREACH(args, first, next, cur) {
-        ast_expression_print(cur->value, indentation + DEPTH);
-    }
 }
 
 void ast_expression_print(Expression *expression, int indentation) {
@@ -81,20 +74,41 @@ void ast_expression_print(Expression *expression, int indentation) {
     }
 }
 
+void ast_expression_list_print(List *expressions, int indentation) {
+    LIST_FOREACH(expressions, first, next, cur) {
+        ast_expression_print(cur->value, indentation + DEPTH);
+    }
+}
+
+void ast_application_print(Application *application, int indentation) {
+    indent(indentation);
+    printf("Application\n");
+    ast_expression_print(application->expr, indentation + DEPTH);
+    ast_arg_list_print(application->args_expressions, indentation + DEPTH);
+}
+
+void ast_arg_list_print(List *args, int indentation) {
+    indent(indentation);
+    printf("%d args\n", list_count(args));
+    LIST_FOREACH(args, first, next, cur) {
+        ast_expression_print(cur->value, indentation + DEPTH);
+    }
+}
+
 void ast_let_print(Let *let, int indentation) {
     indent(indentation);
     printf("Let\n");
-    LIST_FOREACH(let->variable_expressions, first, next, cur) {
-      ast_let_variable_print(cur->value, indentation + DEPTH);
+    LIST_FOREACH(let->bindings, first, next, cur) {
+      ast_let_binding_print(cur->value, indentation + DEPTH);
     }
-    ast_expression_print(let->expr, indentation + DEPTH);
+    ast_expression_list_print(let->expressions, indentation + DEPTH);
 }
 
-void ast_let_variable_print(LetVariable *let_variable, int indentation) {
+void ast_let_binding_print(LetBinding *letBinding, int indentation) {
     indent(indentation);
-    bstring name = let_variable->name;
+    bstring name = letBinding->name;
     printf("%s:\n", bdata(name));
-    ast_expression_print(let_variable->expr, indentation + DEPTH);
+    ast_expression_print(letBinding->expression, indentation + DEPTH);
 }
 
 void ast_number_print(Number *number, int indentation) {

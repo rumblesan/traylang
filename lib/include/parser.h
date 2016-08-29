@@ -6,8 +6,8 @@
 #include "ast.h"
 #include "bclib/bstrlib.h"
 
-int parse(Block **block, FILE *fp);
+int parse(Program **program, FILE *fp);
 
-int parse_string(Block **block, bstring program);
+int parse_string(Program **program, bstring text);
 
 #endif

@@ -24,7 +24,7 @@ error:
     return NULL;
 }
 
-LambdaObject *lambda_create(List *arg_names, Block *body) {
+LambdaObject *lambda_create(List *arg_names, List *body) {
     LambdaObject *lambda = malloc(sizeof(LambdaObject));
     check_mem(lambda);
     lambda->arg_names = arg_names;
@@ -61,7 +61,7 @@ Object *object_c_function(Interpreter *interpreter, c_func func) {
     return object;
 }
 
-Object *object_lambda(Interpreter *interpreter, List *arg_names, Block *body) {
+Object *object_lambda(Interpreter *interpreter, List *arg_names, List *body) {
     Object *object = object_create(interpreter);
     object->type = LAMBDA;
     LambdaObject *lambda = lambda_create(arg_names, body);
