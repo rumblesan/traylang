@@ -74,6 +74,9 @@ void ast_expression_print(Expression *expression, int indentation) {
         case LAMBDAEXPR:
             ast_lambda_print(expression->lambda, indentation + DEPTH);
             break;
+        case IFEXPR:
+            ast_if_print(expression->ifExpr, indentation + DEPTH);
+            break;
     }
 }
 
@@ -151,4 +154,22 @@ void ast_lambda_print(Lambda *lambda, int indentation) {
     printf("\n");
 }
 
+void ast_if_print(If *ifExpr, int indentation) {
+    indent(indentation);
+    printf("If\n");
 
+    indent(indentation);
+    printf("predicate:\n");
+    ast_expression_print(ifExpr->predicate, indentation + DEPTH);
+
+    indent(indentation);
+    printf("if block:\n");
+    ast_expression_print(ifExpr->ifBlock, indentation + DEPTH);
+
+    if (ifExpr->elseBlock != NULL) {
+        indent(indentation);
+        printf("else block:\n");
+        ast_expression_print(ifExpr->elseBlock, indentation + DEPTH);
+    }
+    printf("\n");
+}

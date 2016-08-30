@@ -214,6 +214,10 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression) {
             debug("interpret boolean");
             v = interpret_boolean(interpreter, expression->boolean);
             break;
+        case IFEXPR:
+            debug("interpret if");
+            v = interpret_if(interpreter, expression->ifExpr);
+            break;
         case NUMBEREXPR:
             debug("interpret number");
             v = interpret_number(interpreter, expression->number);
@@ -268,6 +272,28 @@ Object *interpret_boolean(Interpreter *interpreter, Boolean *boolean) {
 error:
     if (interpreter->error == 0) {
         interpreter_error(interpreter, bfromcstr("Error interpreting number"));
+    }
+    return NULL;
+}
+
+Object *interpret_if(Interpreter *interpreter, If *ifExpr) {
+    Object *pred_value = interpret_expression(interpreter, ifExpr->predicate);
+    check(pred_value != NULL, "Error evaluating predicate");
+    if (pred_value->type != BOOLEAN) {
+        interpreter_error(interpreter, bfromcstr("If predicate must be boolean"));
+    }
+    Object *return_value = object_nothing(interpreter);
+    if (pred_value->boolean == 1) {
+        return_value = interpret_expression(interpreter, ifExpr->ifBlock);
+    }
+    if (ifExpr->elseBlock != NULL && pred_value->boolean == 0) {
+        return_value = interpret_expression(interpreter, ifExpr->elseBlock);
+    }
+    check(return_value != NULL, "Error evaluating if");
+    return return_value;
+error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting if"));
     }
     return NULL;
 }

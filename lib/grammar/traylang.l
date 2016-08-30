@@ -12,6 +12,7 @@
 "def"                         return DEFINE;
 "lambda"                      return LAMBDA;
 "let"                         return LET;
+"if"                          return IF;
 
 "#t"                          return TRUE;
 "#f"                          return FALSE;

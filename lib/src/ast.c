@@ -120,6 +120,9 @@ void ast_expression_cleanup(Expression *expression) {
         case LAMBDAEXPR:
             ast_lambda_cleanup(expression->lambda);
             break;
+        case IFEXPR:
+            ast_if_cleanup(expression->ifExpr);
+            break;
     }
     free(expression);
 }
@@ -148,6 +151,13 @@ Expression *ast_number_expression(Number *number) {
     Expression *expression = ast_expression_create();
     expression->expressionType = NUMBEREXPR;
     expression->number = number;
+    return expression;
+}
+
+Expression *ast_if_expression(If *ifExpr) {
+    Expression *expression = ast_expression_create();
+    expression->expressionType = IFEXPR;
+    expression->ifExpr = ifExpr;
     return expression;
 }
 
@@ -277,6 +287,26 @@ void ast_let_binding_cleanup(LetBinding *letBinding) {
     bdestroy(letBinding->name);
     ast_expression_cleanup(letBinding->expression);
     free(letBinding);
+}
+
+/* If AST Node */
+If *ast_if_create(
+    Expression *predicate,
+    Expression *ifBlock,
+    Expression *elseBlock
+) {
+    If *ifExpr = malloc(sizeof(If));
+    ifExpr->predicate = predicate;
+    ifExpr->ifBlock   = ifBlock;
+    ifExpr->elseBlock = elseBlock;
+    return ifExpr;
+}
+
+void ast_if_cleanup(If *ifExpr) {
+    ast_expression_cleanup(ifExpr->predicate);
+    ast_expression_cleanup(ifExpr->ifBlock);
+    ast_expression_cleanup(ifExpr->elseBlock);
+    free(ifExpr);
 }
 
 /* Let AST Node */

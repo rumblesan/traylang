@@ -61,6 +61,7 @@ int parse_string(Program **ast, bstring program) {
     VarDefinition *varDefNode;
     Expression    *expressionNode;
     Application   *applicationNode;
+    If            *ifNode;
     List          *listNode;
     Lambda        *lambdaNode;
     Let           *letNode;
@@ -76,6 +77,7 @@ int parse_string(Program **ast, bstring program) {
 %token DEFINE
 %token LAMBDA
 %token LET
+%token IF
 %token OPAREN
 %token CPAREN
 %token DQUOTE
@@ -94,6 +96,7 @@ int parse_string(Program **ast, bstring program) {
 %type<expressionNode> expression
 %type<listNode> expressionList
 %type<applicationNode> application
+%type<ifNode> ifExpr
 %type<listNode> argList
 %type<listNode> argNamesList
 %type<listNode> letBindingList
@@ -151,6 +154,10 @@ expression: variable
           | lambda
           {
               $$ = ast_lambda_expression($1);
+          }
+          | ifExpr
+          {
+              $$ = ast_if_expression($1);
           }
           | STRING
           {

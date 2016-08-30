@@ -60,6 +60,25 @@ Lambda *ast_lambda_create(List *arg_names, List *body);
 
 void ast_lambda_cleanup(Lambda *lambda);
 
+/* If AST Node */
+typedef struct If {
+
+    struct Expression *predicate;
+
+    struct Expression *ifBlock;
+
+    struct Expression *elseBlock;
+
+} If;
+
+If *ast_if_create(
+    struct Expression *predicate,
+    struct Expression *ifBlock,
+    struct Expression *elseBlock
+);
+
+void ast_if_cleanup(If *ifExpression);
+
 /* Variable AST Node */
 typedef struct Variable {
 
@@ -116,6 +135,7 @@ typedef enum {
   LETEXPR,
   NUMBEREXPR,
   BOOLEANEXPR,
+  IFEXPR,
   STRINGEXPR,
   VARIABLEEXPR,
   LAMBDAEXPR
@@ -130,6 +150,7 @@ typedef struct Expression {
         Let *let;
         Number *number;
         Boolean *boolean;
+        If *ifExpr;
         String *string;
         Variable *variable;
         Lambda *lambda;
@@ -146,6 +167,8 @@ Expression *ast_application_expression(Application *application);
 Expression *ast_let_expression(Let *let);
 
 Expression *ast_number_expression(Number *number);
+
+Expression *ast_if_expression(If *ifExpression);
 
 Expression *ast_boolean_expression(Boolean *boolean);
 

@@ -22,6 +22,8 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression);
 
 Object *interpret_lambda(Interpreter *interpreter, Lambda *lambda);
 
+Object *interpret_if(Interpreter *interpreter, If *ifExpr);
+
 Object *interpret_let(Interpreter *interpreter, Let *let);
 
 Object *interpret_let_binding(Interpreter *interpreter, LetBinding *letBinding);

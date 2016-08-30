@@ -34,4 +34,6 @@ void ast_variable_print(Variable *variable, int indentation);
 
 void ast_lambda_print(Lambda *lambda, int indentation);
 
+void ast_if_print(If *ifExpr, int indentation);
+
 #endif
