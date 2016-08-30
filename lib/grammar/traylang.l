@@ -13,7 +13,8 @@
 "lambda"                      return LAMBDA;
 "let"                         return LET;
 
-"#"                           return HASH;
+"#t"                          return TRUE;
+"#f"                          return FALSE;
 
 "("                           return OPAREN;
 ")"                           return CPAREN;

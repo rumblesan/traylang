@@ -80,7 +80,8 @@ int parse_string(Program **ast, bstring program) {
 %token CPAREN
 %token DQUOTE
 %token SQUOTE
-%token HASH
+%token TRUE
+%token FALSE
 %token<number> NUMBER
 %token<string> STRING
 %token<identifier> IDENTIFIER
@@ -220,17 +221,23 @@ lambda: OPAREN LAMBDA OPAREN argNamesList CPAREN OPAREN forms CPAREN CPAREN
        }
        ;
 
+ifExpr: OPAREN IF expression expression expression CPAREN
+      {
+        $$ = ast_if_create($3, $4, $5);
+      }
+      ;
+
 variable: IDENTIFIER
         {
             $$ = ast_variable_create($1);
         }
         ;
 
-boolean: HASH "t"
+boolean: TRUE
        {
            $$ = ast_boolean_create(BOOLEANTRUE);
        }
-       | HASH "f"
+       | FALSE
        {
            $$ = ast_boolean_create(BOOLEANFALSE);
        }
