@@ -12,6 +12,7 @@ typedef enum {
     LIST,
     NOTHING,
     NUMBER,
+    BOOLEAN,
     STRING,
     CDATA
 } ObjectType;
@@ -35,6 +36,7 @@ typedef struct Object {
         LambdaObject *lambda;
         List *list;
         double number;
+        int boolean;
         bstring string;
         void *cdata;
     };

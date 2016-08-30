@@ -34,6 +34,8 @@ Object *interpret_call_c_function(Interpreter *interpreter, c_func func, List *a
 
 Object *interpret_number(Interpreter *interpreter, Number *number);
 
+Object *interpret_boolean(Interpreter *interpreter, Boolean *boolean);
+
 Object *interpret_string(Interpreter *interpreter, String *string);
 
 #endif

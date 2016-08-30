@@ -9,6 +9,22 @@ struct Form;
 
 typedef struct tagbstring Identifier;
 
+/* Boolean Node */
+typedef enum {
+  BOOLEANTRUE,
+  BOOLEANFALSE
+} BooleanValue;
+
+typedef struct Boolean {
+
+    BooleanValue value;
+
+} Boolean;
+
+Boolean *ast_boolean_create(BooleanValue value);
+
+void ast_boolean_cleanup(Boolean *boolean);
+
 /* Number Literal AST Node */
 typedef struct Number {
 
@@ -95,7 +111,15 @@ Application *ast_application_create(struct Expression *expr, List *args_expressi
 void ast_application_cleanup(Application *application);
 
 /* Expression AST Node */
-typedef enum {APPLICATIONEXPR, LETEXPR, NUMBEREXPR, STRINGEXPR, VARIABLEEXPR, LAMBDAEXPR} ExpressionType;
+typedef enum {
+  APPLICATIONEXPR,
+  LETEXPR,
+  NUMBEREXPR,
+  BOOLEANEXPR,
+  STRINGEXPR,
+  VARIABLEEXPR,
+  LAMBDAEXPR
+} ExpressionType;
 
 typedef struct Expression {
 
@@ -105,6 +129,7 @@ typedef struct Expression {
         Application *application;
         Let *let;
         Number *number;
+        Boolean *boolean;
         String *string;
         Variable *variable;
         Lambda *lambda;
@@ -121,6 +146,8 @@ Expression *ast_application_expression(Application *application);
 Expression *ast_let_expression(Let *let);
 
 Expression *ast_number_expression(Number *number);
+
+Expression *ast_boolean_expression(Boolean *boolean);
 
 Expression *ast_string_expression(String *string);
 

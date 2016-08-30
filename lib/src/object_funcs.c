@@ -89,6 +89,13 @@ Object *object_number(Interpreter *interpreter, double num) {
     return object;
 }
 
+Object *object_boolean(Interpreter *interpreter, int boolean) {
+    Object *object = object_create(interpreter);
+    object->type = BOOLEAN;
+    object->boolean = boolean;
+    return object;
+}
+
 Object *object_string(Interpreter *interpreter, bstring string) {
     Object *object = object_create(interpreter);
     object->type = STRING;
@@ -120,6 +127,9 @@ void object_destroy(Object *object) {
             break;
         case NUMBER:
             debug("No need to free number");
+            break;
+        case BOOLEAN:
+            debug("No need to free boolean");
             break;
         case STRING:
             bdestroy(object->string);

@@ -62,6 +62,9 @@ void ast_expression_print(Expression *expression, int indentation) {
         case NUMBEREXPR:
             ast_number_print(expression->number, indentation + DEPTH);
             break;
+        case BOOLEANEXPR:
+            ast_boolean_print(expression->boolean, indentation + DEPTH);
+            break;
         case STRINGEXPR:
             ast_string_print(expression->string, indentation + DEPTH);
             break;
@@ -114,7 +117,15 @@ void ast_let_binding_print(LetBinding *letBinding, int indentation) {
 void ast_number_print(Number *number, int indentation) {
     indent(indentation);
     printf("Number: %f\n", number->value);
+}
 
+void ast_boolean_print(Boolean *boolean, int indentation) {
+    indent(indentation);
+    printf("Boolean: ");
+    switch(boolean->value) {
+    case BOOLEANTRUE:  printf("true\n"); break;
+    case BOOLEANFALSE: printf("false\n"); break;
+    }
 }
 
 void ast_string_print(String *string, int indentation) {

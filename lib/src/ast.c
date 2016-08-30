@@ -108,6 +108,9 @@ void ast_expression_cleanup(Expression *expression) {
         case NUMBEREXPR:
             ast_number_cleanup(expression->number);
             break;
+        case BOOLEANEXPR:
+            ast_boolean_cleanup(expression->boolean);
+            break;
         case STRINGEXPR:
             ast_string_cleanup(expression->string);
             break;
@@ -145,6 +148,13 @@ Expression *ast_number_expression(Number *number) {
     Expression *expression = ast_expression_create();
     expression->expressionType = NUMBEREXPR;
     expression->number = number;
+    return expression;
+}
+
+Expression *ast_boolean_expression(Boolean *boolean) {
+    Expression *expression = ast_expression_create();
+    expression->expressionType = BOOLEANEXPR;
+    expression->boolean = boolean;
     return expression;
 }
 
@@ -199,6 +209,17 @@ Number *ast_number_create(double value) {
 
 void ast_number_cleanup(Number *number) {
     free(number);
+}
+
+/* Boolean Literal AST Node */
+Boolean *ast_boolean_create(BooleanValue value) {
+    Boolean *boolean = malloc(sizeof(Boolean));
+    boolean->value = value;
+    return boolean;
+}
+
+void ast_boolean_cleanup(Boolean *boolean) {
+    free(boolean);
 }
 
 /* String Literal AST Node */

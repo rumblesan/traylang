@@ -18,6 +18,8 @@ Object *object_nothing(Interpreter *interpreter);
 
 Object *object_number(Interpreter *interpreter, double number);
 
+Object *object_boolean(Interpreter *interpreter, int boolean);
+
 Object *object_string(Interpreter *interpreter, bstring string);
 
 Object *object_cdata(Interpreter *interpreter, void *cdata);

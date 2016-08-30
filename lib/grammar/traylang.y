@@ -66,6 +66,7 @@ int parse_string(Program **ast, bstring program) {
     Let           *letNode;
     LetBinding    *letBindingNode;
     Number        *numberNode;
+    Boolean       *booleanNode;
     Variable      *variableNode;
     Identifier    *identifier;
     bstring       string;
@@ -79,10 +80,12 @@ int parse_string(Program **ast, bstring program) {
 %token CPAREN
 %token DQUOTE
 %token SQUOTE
+%token HASH
 %token<number> NUMBER
 %token<string> STRING
 %token<identifier> IDENTIFIER
 %type<programNode> program
+%type<booleanNode> boolean
 %type<formNode> form
 %type<listNode> forms
 %type<definitionNode> definition
@@ -161,6 +164,10 @@ expression: variable
                   ast_number_create($1)
               );
           }
+          | boolean
+          {
+              $$ = ast_boolean_expression($1);
+          }
           | application
           {
               $$ = ast_application_expression($1);
@@ -218,6 +225,16 @@ variable: IDENTIFIER
             $$ = ast_variable_create($1);
         }
         ;
+
+boolean: HASH "t"
+       {
+           $$ = ast_boolean_create(BOOLEANTRUE);
+       }
+       | HASH "f"
+       {
+           $$ = ast_boolean_create(BOOLEANFALSE);
+       }
+       ;
 
 let: OPAREN LET OPAREN letBindingList CPAREN expressionList CPAREN
           {

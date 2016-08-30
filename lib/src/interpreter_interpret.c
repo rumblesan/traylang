@@ -210,6 +210,10 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression) {
             debug("interpret let");
             v = interpret_let(interpreter, expression->let);
             break;
+        case BOOLEANEXPR:
+            debug("interpret boolean");
+            v = interpret_boolean(interpreter, expression->boolean);
+            break;
         case NUMBEREXPR:
             debug("interpret number");
             v = interpret_number(interpreter, expression->number);
@@ -243,6 +247,22 @@ error:
 
 Object *interpret_number(Interpreter *interpreter, Number *number) {
     Object *dv = object_number(interpreter, number->value);
+    check(dv != NULL, "Could not create object")
+    return dv;
+error:
+    if (interpreter->error == 0) {
+        interpreter_error(interpreter, bfromcstr("Error interpreting number"));
+    }
+    return NULL;
+}
+
+Object *interpret_boolean(Interpreter *interpreter, Boolean *boolean) {
+    int bool_value = 0;
+    switch(boolean->value) {
+        case BOOLEANTRUE:  bool_value = 1; break;
+        case BOOLEANFALSE: bool_value = 0; break;
+    }
+    Object *dv = object_boolean(interpreter, bool_value);
     check(dv != NULL, "Could not create object")
     return dv;
 error:

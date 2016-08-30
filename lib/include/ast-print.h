@@ -26,6 +26,8 @@ void ast_let_binding_print(LetBinding *letBinding, int indentation);
 
 void ast_number_print(Number *number, int indentation);
 
+void ast_boolean_print(Boolean *boolean, int indentation);
+
 void ast_string_print(String *string, int indentation);
 
 void ast_variable_print(Variable *variable, int indentation);
