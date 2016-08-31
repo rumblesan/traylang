@@ -4,9 +4,7 @@
 #include "bclib/list.h"
 #include "bclib/bstrlib.h"
 
-struct Program;
-struct Form;
-
+/* Identifier is just a bstring */
 typedef struct tagbstring Identifier;
 
 /* Boolean Node */
