@@ -99,12 +99,6 @@ Expression *ast_expression_create() {
 
 void ast_expression_cleanup(Expression *expression) {
     switch(expression->expressionType) {
-        case APPLICATIONEXPR:
-            ast_application_cleanup(expression->application);
-            break;
-        case LETEXPR:
-            ast_let_cleanup(expression->let);
-            break;
         case NUMBEREXPR:
             ast_number_cleanup(expression->number);
             break;
@@ -119,6 +113,12 @@ void ast_expression_cleanup(Expression *expression) {
             break;
         case LAMBDAEXPR:
             ast_lambda_cleanup(expression->lambda);
+            break;
+        case APPLICATIONEXPR:
+            ast_application_cleanup(expression->application);
+            break;
+        case LETEXPR:
+            ast_let_cleanup(expression->let);
             break;
         case IFEXPR:
             ast_if_cleanup(expression->ifExpr);
@@ -209,72 +209,6 @@ void ast_application_cleanup(Application *application) {
     free(application);
 }
 
-/* Number Literal AST Node */
-Number *ast_number_create(double value) {
-    Number *number = malloc(sizeof(Number));
-    number->value = value;
-
-    return number;
-}
-
-void ast_number_cleanup(Number *number) {
-    free(number);
-}
-
-/* Boolean Literal AST Node */
-Boolean *ast_boolean_create(BooleanValue value) {
-    Boolean *boolean = malloc(sizeof(Boolean));
-    boolean->value = value;
-    return boolean;
-}
-
-void ast_boolean_cleanup(Boolean *boolean) {
-    free(boolean);
-}
-
-/* String Literal AST Node */
-String *ast_string_create(bstring value) {
-    String *string = malloc(sizeof(String));
-    string->value = value;
-
-    return string;
-}
-
-void ast_string_cleanup(String *string) {
-    bdestroy(string->value);
-    free(string);
-}
-
-/* Variable AST Node */
-Variable *ast_variable_create(bstring name) {
-    Variable *variable = malloc(sizeof(Variable));
-    variable->name = name;
-
-    return variable;
-}
-
-void ast_variable_cleanup(Variable *variable) {
-    bdestroy(variable->name);
-    free(variable);
-}
-
-/* Lambda AST Node */
-Lambda *ast_lambda_create(List *arg_names, List *body) {
-    Lambda *lambda = malloc(sizeof(Lambda));
-    lambda->arg_names = arg_names;
-    lambda->body = body;
-    return lambda;
-}
-
-void ast_lambda_cleanup(Lambda *lambda) {
-    bstring argname;
-    LIST_FOREACH(lambda->arg_names, first, next, cur) {
-        argname = cur->value;
-        bdestroy(argname);
-    }
-    ast_expression_list_cleanup(lambda->body);
-    free(lambda);
-}
 
 LetBinding *ast_let_binding_create(bstring name, Expression *expression) {
     LetBinding *letBinding = malloc(sizeof(LetBinding));
@@ -327,3 +261,69 @@ void ast_let_cleanup(Let *let) {
     free(let);
 }
 
+/* Lambda AST Node */
+Lambda *ast_lambda_create(List *arg_names, List *body) {
+    Lambda *lambda = malloc(sizeof(Lambda));
+    lambda->arg_names = arg_names;
+    lambda->body = body;
+    return lambda;
+}
+
+void ast_lambda_cleanup(Lambda *lambda) {
+    bstring argname;
+    LIST_FOREACH(lambda->arg_names, first, next, cur) {
+        argname = cur->value;
+        bdestroy(argname);
+    }
+    ast_expression_list_cleanup(lambda->body);
+    free(lambda);
+}
+
+/* Variable AST Node */
+Variable *ast_variable_create(bstring name) {
+    Variable *variable = malloc(sizeof(Variable));
+    variable->name = name;
+
+    return variable;
+}
+
+void ast_variable_cleanup(Variable *variable) {
+    bdestroy(variable->name);
+    free(variable);
+}
+
+/* String Literal AST Node */
+String *ast_string_create(bstring value) {
+    String *string = malloc(sizeof(String));
+    string->value = value;
+
+    return string;
+}
+
+void ast_string_cleanup(String *string) {
+    bdestroy(string->value);
+    free(string);
+}
+
+/* Boolean Literal AST Node */
+Boolean *ast_boolean_create(BooleanValue value) {
+    Boolean *boolean = malloc(sizeof(Boolean));
+    boolean->value = value;
+    return boolean;
+}
+
+void ast_boolean_cleanup(Boolean *boolean) {
+    free(boolean);
+}
+
+/* Number Literal AST Node */
+Number *ast_number_create(double value) {
+    Number *number = malloc(sizeof(Number));
+    number->value = value;
+
+    return number;
+}
+
+void ast_number_cleanup(Number *number) {
+    free(number);
+}
