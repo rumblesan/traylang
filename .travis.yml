@@ -6,9 +6,11 @@ script:
 - git clone https://github.com/rumblesan/bclib.git
 - ls
 - cd bclib/build
+- cmake ..
 - make
 - make test
 - make install
 - cd ../../build
+- cmake ..
 - make
 - make test
