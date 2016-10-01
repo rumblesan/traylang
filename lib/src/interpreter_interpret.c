@@ -218,6 +218,10 @@ Object *interpret_expression(Interpreter *interpreter, Expression *expression) {
             debug("interpret if");
             v = interpret_if(interpreter, expression->ifExpr);
             break;
+        case LISTEXPR:
+            debug("interpret list");
+            v = interpret_expression_list(interpreter, expression->list);
+            break;
         case NUMBEREXPR:
             debug("interpret number");
             v = interpret_number(interpreter, expression->number);

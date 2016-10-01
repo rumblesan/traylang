@@ -133,6 +133,7 @@ typedef enum {
   BOOLEANEXPR,
   STRINGEXPR,
   VARIABLEEXPR,
+  LISTEXPR,
   LAMBDAEXPR,
   APPLICATIONEXPR,
   LETEXPR,
@@ -148,6 +149,7 @@ typedef struct Expression {
         Boolean *boolean;
         String *string;
         Variable *variable;
+        List *list;
         Lambda *lambda;
         Application *application;
         Let *let;
@@ -167,6 +169,8 @@ Expression *ast_boolean_expression(Boolean *boolean);
 Expression *ast_string_expression(String *string);
 
 Expression *ast_variable_expression(Variable *variable);
+
+Expression *ast_list_expression(List *list);
 
 Expression *ast_lambda_expression(Lambda *lambda);
 

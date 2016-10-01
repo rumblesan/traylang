@@ -40,6 +40,7 @@ add_library(traylang STATIC
 
 find_package(BCLib REQUIRED)
 include_directories("${BCLIB_INCLUDE_DIRS}")
+message( STATUS "bclib include dir:    " ${BCLIB_INCLUDE_DIRS})
 target_link_libraries(traylang bclib)
 
 

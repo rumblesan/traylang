@@ -49,6 +49,12 @@ void ast_vardef_print(VarDefinition *vardef, int indentation) {
     ast_expression_print(vardef->expression, indentation + DEPTH);
 }
 
+void ast_expression_list_print(List *expressions, int indentation) {
+    LIST_FOREACH(expressions, first, next, cur) {
+        ast_expression_print(cur->value, indentation + DEPTH);
+    }
+}
+
 void ast_expression_print(Expression *expression, int indentation) {
     indent(indentation);
     printf("Expression\n");
@@ -71,18 +77,15 @@ void ast_expression_print(Expression *expression, int indentation) {
         case VARIABLEEXPR:
             ast_variable_print(expression->variable, indentation + DEPTH);
             break;
+        case LISTEXPR:
+            ast_expression_list_print(expression->list, indentation + DEPTH);
+            break;
         case LAMBDAEXPR:
             ast_lambda_print(expression->lambda, indentation + DEPTH);
             break;
         case IFEXPR:
             ast_if_print(expression->ifExpr, indentation + DEPTH);
             break;
-    }
-}
-
-void ast_expression_list_print(List *expressions, int indentation) {
-    LIST_FOREACH(expressions, first, next, cur) {
-        ast_expression_print(cur->value, indentation + DEPTH);
     }
 }
 

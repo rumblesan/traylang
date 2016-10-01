@@ -20,6 +20,8 @@ Object *interpret_vardef(Interpreter *interpreter, VarDefinition *vardef);
 
 Object *interpret_expression(Interpreter *interpreter, Expression *expression);
 
+Object *interpret_expression_list(Interpreter *interpreter, List *expressions);
+
 Object *interpret_lambda(Interpreter *interpreter, Lambda *lambda);
 
 Object *interpret_if(Interpreter *interpreter, If *ifExpr);

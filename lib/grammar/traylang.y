@@ -80,8 +80,7 @@ int parse_string(Program **ast, bstring program) {
 %token IF
 %token OPAREN
 %token CPAREN
-%token DQUOTE
-%token SQUOTE
+%token QUOTE
 %token TRUE
 %token FALSE
 %token<number> NUMBER
@@ -94,6 +93,7 @@ int parse_string(Program **ast, bstring program) {
 %type<definitionNode> definition
 %type<varDefNode> vardefinition
 %type<expressionNode> expression
+%type<listNode> list
 %type<listNode> expressionList
 %type<applicationNode> application
 %type<ifNode> ifExpr
@@ -184,6 +184,10 @@ expression: variable
           {
               $$ = ast_let_expression($1);
           }
+          | list
+          {
+              $$ = ast_list_expression($1);
+          }
           ;
 
 expressionList: %empty
@@ -255,6 +259,12 @@ let: OPAREN LET OPAREN letBindingList CPAREN expressionList CPAREN
                $$ = ast_let_create($4, $6);
           }
           ;
+
+list: QUOTE OPAREN expressionList CPAREN
+    {
+      $$ = $3;
+    }
+    ;
 
 letBindingList: %empty
               {

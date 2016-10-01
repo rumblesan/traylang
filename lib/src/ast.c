@@ -97,6 +97,12 @@ Expression *ast_expression_create() {
     return expression;
 }
 
+void ast_expression_list_cleanup(List *expressions) {
+    LIST_FOREACH(expressions, first, next, cur) {
+        ast_expression_cleanup(cur->value);
+    }
+}
+
 void ast_expression_cleanup(Expression *expression) {
     switch(expression->expressionType) {
         case NUMBEREXPR:
@@ -110,6 +116,9 @@ void ast_expression_cleanup(Expression *expression) {
             break;
         case VARIABLEEXPR:
             ast_variable_cleanup(expression->variable);
+            break;
+        case LISTEXPR:
+            ast_expression_list_cleanup(expression->list);
             break;
         case LAMBDAEXPR:
             ast_lambda_cleanup(expression->lambda);
@@ -125,12 +134,6 @@ void ast_expression_cleanup(Expression *expression) {
             break;
     }
     free(expression);
-}
-
-void ast_expression_list_cleanup(List *expressions) {
-    LIST_FOREACH(expressions, first, next, cur) {
-        ast_expression_cleanup(cur->value);
-    }
 }
 
 Expression *ast_application_expression(Application *application) {
@@ -179,6 +182,13 @@ Expression *ast_variable_expression(Variable *variable) {
     Expression *expression = ast_expression_create();
     expression->expressionType = VARIABLEEXPR;
     expression->variable = variable;
+    return expression;
+}
+
+Expression *ast_list_expression(List *list) {
+    Expression *expression = ast_expression_create();
+    expression->expressionType = LISTEXPR;
+    expression->list = list;
     return expression;
 }
 

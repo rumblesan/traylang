@@ -13,6 +13,7 @@
 "lambda"                      return LAMBDA;
 "let"                         return LET;
 "if"                          return IF;
+"'"                           return QUOTE;
 
 "#t"                          return TRUE;
 "#f"                          return FALSE;
