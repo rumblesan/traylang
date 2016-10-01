@@ -1,0 +1,13 @@
+language: c
+compiler:
+- clang
+- gcc
+script
+- git clone https://github.com/rumblesan/bclib.git
+- cd bclib/build
+- make
+- make test
+- make install
+- cd ../../build
+- make
+- make test
