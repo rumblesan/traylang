@@ -2,7 +2,7 @@ language: c
 compiler:
 - clang
 - gcc
-script
+script:
 - git clone https://github.com/rumblesan/bclib.git
 - cd bclib/build
 - make
