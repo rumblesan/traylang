@@ -1,3 +1,4 @@
+sudo: required
 language: c
 compiler:
 - clang
@@ -5,15 +6,13 @@ compiler:
 script:
 - BUILD_DIR=$TRAVIS_BUILD_DIR/..
 - cd $BUILD_DIR
-- pwd
-- mkdir ./cmake
 - git clone https://github.com/rumblesan/bclib.git
 - cd $BUILD_DIR/bclib/build
-- cmake .. -DINSTALL_CMAKE_DIR:STRING=$BUILD_DIR/cmake
+- cmake ..
 - make
 - make test
-- make install
+- sudo make install
 - cd $BUILD_DIR/traylang/build
-- cmake .. -DINSTALL_CMAKE_DIR:STRING=$BUILD_DIR/cmake
+- cmake ..
 - make
 - make test
