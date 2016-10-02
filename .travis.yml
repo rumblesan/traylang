@@ -3,7 +3,7 @@ compiler:
 - clang
 - gcc
 script:
-- cd $HOME
+- cd $HOME/builds
 - mkdir ./cmake
 - ls
 - git clone https://github.com/rumblesan/bclib.git
