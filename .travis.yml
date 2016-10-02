@@ -5,6 +5,7 @@ compiler:
 script:
 - git clone https://github.com/rumblesan/bclib.git
 - ls
+- mkdir /usr/local/lib/cmake
 - cd bclib/build
 - cmake ..
 - make
