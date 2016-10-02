@@ -3,18 +3,17 @@ compiler:
 - clang
 - gcc
 script:
-- pwd
-- cd $TRAVIS_BUILD_DIR
+- BUILD_DIR=$TRAVIS_BUILD_DIR/..
+- cd $BUILD_DIR
 - pwd
 - mkdir ./cmake
-- ls
 - git clone https://github.com/rumblesan/bclib.git
-- cd bclib/build
-- cmake .. -DINSTALL_CMAKE_DIR:STRING=$HOME/cmake
+- cd $BUILD_DIR/bclib/build
+- cmake .. -DINSTALL_CMAKE_DIR:STRING=$BUILD_DIR/cmake
 - make
 - make test
 - make install
-- cd $TRAVIS_BUILD_DIR/traylang
-- cmake .. -DINSTALL_CMAKE_DIR:STRING=$HOME/cmake
+- cd $BUILD_DIR/traylang/build
+- cmake .. -DINSTALL_CMAKE_DIR:STRING=$BUILD_DIR/cmake
 - make
 - make test
