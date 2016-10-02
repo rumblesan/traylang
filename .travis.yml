@@ -5,11 +5,12 @@ compiler:
 - gcc
 before_script:
 - git clone https://github.com/rumblesan/bclib.git
-- cd bclib/build
+- pushd bclib/build
 - cmake ..
 - make
 - make test
 - sudo make install
+- popd
 script:
 - cd build
 - cmake ..
