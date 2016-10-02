@@ -4,7 +4,8 @@ compiler:
 - gcc
 script:
 - pwd
-- cd $HOME/builds
+- cd $TRAVIS_BUILD_DIR
+- pwd
 - mkdir ./cmake
 - ls
 - git clone https://github.com/rumblesan/bclib.git
@@ -13,7 +14,7 @@ script:
 - make
 - make test
 - make install
-- cd $HOME/traylang/build
+- cd $TRAVIS_BUILD_DIR/traylang
 - cmake .. -DINSTALL_CMAKE_DIR:STRING=$HOME/cmake
 - make
 - make test
