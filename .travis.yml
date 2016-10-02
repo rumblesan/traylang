@@ -3,7 +3,7 @@ language: c
 compiler:
 - clang
 - gcc
-before_script:
+script:
 - git clone https://github.com/rumblesan/bclib.git
 - pushd bclib/build
 - pwd
@@ -12,7 +12,6 @@ before_script:
 - make test
 - sudo make install
 - popd
-script:
 - cd build
 - cmake ..
 - make
