@@ -1,6 +1,6 @@
 # much of this pulled from the cmake wiki
 # https://cmake.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.8)
 project(traylang)
 
 set(TRAYLANG_MAJOR_VERSION 1)
