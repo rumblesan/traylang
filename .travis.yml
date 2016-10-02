@@ -3,6 +3,7 @@ compiler:
 - clang
 - gcc
 script:
+- pwd
 - cd $HOME/builds
 - mkdir ./cmake
 - ls
