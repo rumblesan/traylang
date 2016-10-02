@@ -3,15 +3,16 @@ compiler:
 - clang
 - gcc
 script:
-- git clone https://github.com/rumblesan/bclib.git
+- cd $HOME
+- mkdir ./cmake
 - ls
-- mkdir /usr/local/lib/cmake
+- git clone https://github.com/rumblesan/bclib.git
 - cd bclib/build
-- cmake ..
+- cmake .. -DINSTALL_CMAKE_DIR:STRING=$HOME/cmake
 - make
 - make test
 - make install
-- cd ../../build
-- cmake ..
+- cd $HOME/traylang/build
+- cmake .. -DINSTALL_CMAKE_DIR:STRING=$HOME/cmake
 - make
 - make test
