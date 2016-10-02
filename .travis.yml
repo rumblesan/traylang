@@ -3,16 +3,15 @@ language: c
 compiler:
 - clang
 - gcc
-script:
-- BUILD_DIR=$TRAVIS_BUILD_DIR/..
-- cd $BUILD_DIR
+before_script:
 - git clone https://github.com/rumblesan/bclib.git
-- cd $BUILD_DIR/bclib/build
+- cd bclib/build
 - cmake ..
 - make
 - make test
 - sudo make install
-- cd $BUILD_DIR/traylang/build
+script:
+- cd build
 - cmake ..
 - make
 - make test
