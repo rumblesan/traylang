@@ -3,16 +3,22 @@ language: c
 compiler:
 - clang
 - gcc
+addons:
+  apt:
+    packages:
+    - bison
+    - flex
 script:
 - git clone https://github.com/rumblesan/bclib.git
 - pushd bclib/build
 - pwd
-- cmake ..
+- cmake -DINSTALL_INCLUDE_DIR:STRING=/usr/local/include -DINSTALL_LIB_DIR:STRING=/usr/local/lib ..
 - make
 - make test
 - sudo make install
 - popd
 - cd build
-- cmake ..
+- ls
+- cmake -DINSTALL_INCLUDE_DIR:STRING=/usr/local/include -DINSTALL_LIB_DIR:STRING=/usr/local/lib ..
 - make
 - make test
